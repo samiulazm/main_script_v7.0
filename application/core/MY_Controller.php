@@ -14,7 +14,7 @@ class MY_Controller extends CI_Controller
         
         // cache control
         $this->output->set_header('Last-Modified: ' . gmdate("D, d M Y H:i:s") . ' GMT');
-        if (!is_null($get_config) && $get_config['cache_store'] == 0) {
+        if (!is_null($get_config) && isset($get_config['cache_store']) && $get_config['cache_store'] == 0) {
             $this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
         } else {
             $this->output->set_header('Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0');
@@ -26,14 +26,22 @@ class MY_Controller extends CI_Controller
         $branchID = $this->application_model->get_branch_id();
         if (!empty($branchID)) {
             $branch = $this->db->select('currency_formats,symbol_position,symbol,currency,timezone')->where('id', $branchID)->get('branch')->row();
-            $get_config['currency'] = $branch->currency;
-            $get_config['currency_symbol'] = $branch->symbol;
-            $get_config['currency_formats'] = $branch->currency_formats;
-            $get_config['symbol_position'] = $branch->symbol_position;
-            if (!empty($branch->timezone)) {
-                $get_config['timezone'] = $branch->timezone;
+            if ($branch) {
+                $get_config['currency'] = $branch->currency;
+                $get_config['currency_symbol'] = $branch->symbol;
+                $get_config['currency_formats'] = $branch->currency_formats;
+                $get_config['symbol_position'] = $branch->symbol_position;
+                if (!empty($branch->timezone)) {
+                    $get_config['timezone'] = $branch->timezone;
+                }
             }
         }
+        
+        // Ensure $get_config is an array to prevent undefined array key errors
+        if (!is_array($get_config)) {
+            $get_config = array();
+        }
+        
         $this->data['global_config'] = $get_config;
         $this->data['theme_config'] = $this->db->get_where('theme_settings', array('id' => 1))->row_array();
         if (!is_null($get_config) && isset($get_config['timezone'])) {
@@ -123,6 +131,29 @@ class Admin_Controller extends MY_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('saas_model');
+        
+        // Temporary bypass for QR attendance Ajax methods
+        $uri = $this->uri->uri_string();
+        $is_qr_ajax = (strpos($uri, 'qrcode_attendance/getStuListDT') !== FALSE || strpos($uri, 'qrcode_attendance/getStaffListDT') !== FALSE);
+        
+        if (!is_loggedin() && !$is_qr_ajax) {
+            $this->session->set_userdata('redirect_url', current_url());
+            redirect(base_url('authentication'), 'refresh');
+        }
+
+        if (!$this->saas_model->checkSubscriptionValidity()) {
+            redirect(base_url('dashboard'));
+        }
+    }
+}
+
+class Dashboard_Controller extends MY_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('saas_model');
         if (!is_loggedin()) {
             $this->session->set_userdata('redirect_url', current_url());
             redirect(base_url('authentication'), 'refresh');
@@ -138,6 +169,10 @@ class User_Controller extends MY_Controller
         if (!is_student_loggedin() && !is_parent_loggedin()) {
             $this->session->set_userdata('redirect_url', current_url());
             redirect(base_url('authentication'), 'refresh');
+        }
+        $this->load->model('saas_model');
+        if (!$this->saas_model->checkSubscriptionValidity()) {
+            redirect(base_url('dashboard'));
         }
     }
 }
@@ -157,10 +192,16 @@ class Frontend_Controller extends MY_Controller
     {
         parent::__construct();
         $this->load->model('home_model');
+        $this->load->model('saas_model');
         $branchID = $this->home_model->getDefaultBranch();
         $cms_setting = $this->db->get_where('front_cms_setting', array('branch_id' => $branchID))->row_array();
         if (!$cms_setting['cms_active']) {
             redirect(site_url('authentication'));
+        } else {
+            if (!$this->saas_model->checkSubscriptionValidity($branchID)) {
+                $this->session->set_flashdata('website_expired_msg', '1');
+                redirect(base_url());
+            }
         }
         $this->data['cms_setting'] = $cms_setting;
     }
