@@ -5471,6 +5471,8 @@ CREATE TABLE `student_attendance` (
   `date` date NOT NULL,
   `status` varchar(4) DEFAULT NULL COMMENT 'P=Present, A=Absent, H=Holiday, L=Late',
   `qr_code` tinyint(1) NOT NULL DEFAULT 0,
+  `in_time` time DEFAULT NULL,
+  `out_time` time DEFAULT NULL,
   `remark` text DEFAULT NULL,
   `branch_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
