@@ -19,6 +19,10 @@ class System_update_model extends MY_Model
             CURLOPT_USERAGENT => $this->agent->agent_string(),
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_DNS_CACHE_TIMEOUT => 120,
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+            CURLOPT_RESOLVE => ['www.ramomcoder.com:443:104.21.32.1'],
             CURLOPT_URL => UPDATE_INFO_URL,
             CURLOPT_POST => 1,
             CURLOPT_POSTFIELDS => [
