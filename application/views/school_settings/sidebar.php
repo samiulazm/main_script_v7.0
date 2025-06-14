@@ -25,6 +25,9 @@ if ($this->input->get('branch_id')) {
         <?php } if (moduleIsEnabled('attendance')) { ?>
             <li <?=$sub_page == 'school_settings/attendance_type' ? 'class="active"' : '';?>><a href="<?=base_url('school_settings/attendance_type' . $url)?>"><i class="fa-solid fa-signal"></i> <?=translate('attendance_type')?></a></li>
         <?php } ?>
+        <?php if (moduleIsEnabled('tipsoi_device')) { ?>
+            <li <?=$sub_page == 'school_settings/tipsoi_api_config' ? 'class="active"' : '';?>><a href="<?=base_url('school_settings/tipsoi_api_config' . $url)?>"><i class="fas fa-plug"></i> Tipsoi API Configuration</a></li>
+        <?php } ?>
         </ul>
     </div>
 </div>

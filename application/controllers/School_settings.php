@@ -994,4 +994,38 @@ class School_settings extends Admin_Controller
         $this->data['title'] = translate('student_parent_panel');
         $this->load->view('layout/index', $this->data);
     }
+
+    public function tipsoi_api_config()
+    {
+        // Check access permission (re-use attendance add permission or adjust as required)
+        if (!get_permission('student_attendance', 'is_add')) {
+            access_denied();
+        }
+
+        // Load Tipsoi device model to fetch / save config
+        $this->load->model('tipsoi_device_model');
+
+        // Ensure tables and schema are present
+        $this->tipsoi_device_model->ensure_tables_exist();
+        $this->tipsoi_device_model->update_table_schema();
+
+        // Fetch all branches
+        $branches = $this->db->select('id, name')->get('branch')->result_array();
+        $branch_configs = [];
+        foreach ($branches as $branch) {
+            $config = $this->tipsoi_device_model->get_device_config($branch['id']);
+            $branch_configs[$branch['id']] = [
+                'id' => $branch['id'],
+                'name' => $branch['name'],
+                'api_token' => isset($config['api_token']) ? $config['api_token'] : '',
+                'device_name' => isset($config['device_name']) ? $config['device_name'] : 'Tipsoi - ' . $branch['name'],
+            ];
+        }
+
+        $this->data['branch_configs'] = $branch_configs;
+        $this->data['title'] = 'Tipsoi API Token Settings';
+        $this->data['sub_page'] = 'school_settings/tipsoi_api_config';
+        $this->data['main_menu'] = 'school_m';
+        $this->load->view('layout/index', $this->data);
+    }
 }

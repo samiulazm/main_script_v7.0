@@ -220,7 +220,11 @@ class Frontend_Controller extends MY_Controller
         $this->load->model('saas_model');
         $branchID = $this->home_model->getDefaultBranch();
         $cms_setting = $this->db->get_where('front_cms_setting', array('branch_id' => $branchID))->row_array();
-        if (!$cms_setting['cms_active']) {
+
+        // Ensure we have a valid array and the key exists to avoid warnings
+        $is_cms_active = isset($cms_setting['cms_active']) ? (bool) $cms_setting['cms_active'] : false;
+
+        if (!$is_cms_active) {
             redirect(site_url('authentication'));
         } else {
             if (!$this->saas_model->checkSubscriptionValidity($branchID)) {
