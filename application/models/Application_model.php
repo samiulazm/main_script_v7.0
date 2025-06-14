@@ -50,9 +50,16 @@ class Application_model extends CI_Model
 
     public function getSQLMode()
     {
-        $sql = $this->db->query('SELECT @@sql_mode as mode')->row();
-        $r = strpos($sql->mode, 'ONLY_FULL_GROUP_BY') !== false ? true : false;
-        return $r;
+        try {
+            $sql = $this->db->query('SELECT @@sql_mode as mode')->row();
+            if ($sql && isset($sql->mode)) {
+                $r = strpos($sql->mode, 'ONLY_FULL_GROUP_BY') !== false ? true : false;
+                return $r;
+            }
+        } catch (Exception $e) {
+            log_message('error', 'SQL Mode check error: ' . $e->getMessage());
+        }
+        return false;
     }
 
     public function whatsappChat()

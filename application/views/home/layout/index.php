@@ -35,6 +35,41 @@
 		</script>
 		<!-- Google Analytics --> 
 		<?php echo $cms_setting['google_analytics']; ?>
+
+	    <?php 
+	    $getSettings = $this->db->select('pwa_enable')->where('id', 1)->get('saas_settings')->row();
+	    if ($getSettings->pwa_enable == 1) {
+	    	?>
+	    <!-- Web Application Manifest -->
+	    <link rel="manifest" href="./manifest.json">
+	    <!-- Chrome for Android theme color -->
+	    <meta name="theme-color" content="#6e8fd4">
+	    
+	    <!-- Add to homescreen for Chrome on Android -->
+	    <meta name="mobile-web-app-capable" content="yes">
+	    <meta name="application-name" content="Ramom School">
+	    <link rel="icon" sizes="512x512" href="<?php echo base_url('uploads/appIcons/icon-512x512.png')?>">
+	    
+	    <!-- Add to homescreen for Safari on iOS -->
+	    <meta name="apple-mobile-web-app-capable" content="yes">
+	    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	    <meta name="apple-mobile-web-app-title" content="Ramom School">
+	    <link rel="apple-touch-icon" href="<?php echo base_url('uploads/appIcons/icon-512x512.png')?>">
+
+	    <script type="text/javascript">
+	        // Initialize the service worker
+	        if ('serviceWorker' in navigator) {
+	            navigator.serviceWorker.register('/serviceworker.js', {
+	                scope: '/'
+	            }).then(function (registration) {
+	                // Registration was successful
+	            }, function (err) {
+	                // registration failed :(
+	                console.log('Service Worker registration failed: ', err);
+	            });
+	        }
+	    </script>
+	    <?php } ?>
 		
 		<!-- Theme Color Options -->
 		<script type="text/javascript">

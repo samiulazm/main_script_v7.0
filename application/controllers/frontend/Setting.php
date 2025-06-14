@@ -42,11 +42,13 @@ class Setting extends Admin_Controller
     }
 
 
+
     public function save()
     {
         if (!get_permission('frontend_setting', 'is_add')) {
             ajax_access_denied();
         }
+        
         if ($_POST) {
             $branchID = $this->frontend_model->getBranchID();
             $this->form_validation->set_rules('application_title', 'Cms Title', 'trim|required');
@@ -70,6 +72,7 @@ class Setting extends Admin_Controller
             $this->form_validation->set_rules('copyright_bg_color', 'Copyright BG Color', 'trim|required');
             $this->form_validation->set_rules('copyright_text_color', 'Copyright Text Color', 'trim|required');
             $this->form_validation->set_rules('border_radius', 'Border Radius', 'trim|required');
+            
             if ($this->form_validation->run() == true) {
                 $cms_setting = array(
                     'branch_id' => $branchID,
@@ -108,6 +111,7 @@ class Setting extends Admin_Controller
                     'pinterest_url' => $this->input->post('pinterest_url'),
                     'instagram_url' => $this->input->post('instagram_url'),
                 );
+                
                 // upload logo
                 if (isset($_FILES["logo"]) && !empty($_FILES["logo"]['name'])) {
                     $imageNmae = $_FILES['logo']['name'];
@@ -129,7 +133,6 @@ class Setting extends Admin_Controller
                         $cms_setting['fav_icon'] = $newLogoName;
                     }
                 }
-
                 // update all information in the database
                 $this->db->where(array('branch_id' => $branchID));
                 $get = $this->db->get('front_cms_setting');
@@ -140,12 +143,21 @@ class Setting extends Admin_Controller
                     $this->db->insert('front_cms_setting', $cms_setting);
                 }
 
-                set_alert('success', translate('information_has_been_saved_successfully'));
-                $array = array('status' => 'success');
+                // Check for database errors
+                if ($this->db->error()['code'] !== 0) {
+                    $array = array('status' => 'fail', 'error' => array('database' => 'Database error occurred: ' . $this->db->error()['message']));
+                } else {
+                    set_alert('success', translate('information_has_been_saved_successfully'));
+                    $array = array('status' => 'success');
+                }
             } else {
                 $error = $this->form_validation->error_array();
                 $array = array('status' => 'fail', 'error' => $error);
             }
+            
+            echo json_encode($array);
+        } else {
+            $array = array('status' => 'fail', 'error' => array('general' => 'No form data received'));
             echo json_encode($array);
         }
     }
@@ -154,7 +166,7 @@ class Setting extends Admin_Controller
     public function unique_url($alias)
     {
         $branchID = $this->frontend_model->getBranchID();
-        $this->db->where_not_in('branch_id', $branchID);
+        $this->db->where('branch_id !=', $branchID);
         $this->db->where('url_alias', $alias);
         $query = $this->db->get('front_cms_setting');
         if ($query->num_rows() > 0) {

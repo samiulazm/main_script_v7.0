@@ -33,7 +33,7 @@
  * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
  * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
- * @since	Version 1.0.0
+ * @since	Version 3.2.20-dev
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -56,7 +56,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @var	string
  *
  */
-	const CI_VERSION = '3.2.0-dev';
+	define('CI_VERSION', '3.2.0-dev');
 
 /*
  * ------------------------------------------------------

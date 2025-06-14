@@ -48,6 +48,14 @@ if (get_permission('student_birthday_widget', 'is_view') || get_permission('staf
     </div>
 <?php } ?>
 
+<?php 
+if (!is_superadmin_loggedin()) {
+	if (!empty($this->saas_model->getSubscriptionsExpiredNotification())) { ?>
+    <div class="alert alert-danger">
+        <?php echo $this->saas_model->getSubscriptionsExpiredNotification(); ?>
+    </div>
+<?php } } ?>
+
 <div class="dashboard-page">
 	<div class="row">
 <?php if (get_permission('monthly_income_vs_expense_chart', 'is_view')) { ?>

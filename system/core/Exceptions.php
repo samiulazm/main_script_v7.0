@@ -251,6 +251,18 @@ class CI_Exceptions {
 	 */
 	public function show_php_error($severity, $message, $filepath, $line)
 	{
+		// Always skip deprecated notices and user deprecated notices - Updated 2025-06-13
+		if ($severity == 8192 || $severity == 16384 || $severity == E_DEPRECATED || $severity == E_USER_DEPRECATED)
+		{
+			return;
+		}
+		
+		// Also skip if message contains "Creation of dynamic property"
+		if (strpos($message, 'Creation of dynamic property') !== false)
+		{
+			return;
+		}
+		
 		$templates_path = config_item('error_views_path');
 		if (empty($templates_path))
 		{

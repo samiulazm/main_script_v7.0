@@ -50,28 +50,41 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 
-spl_autoload_register(function($className) {
-    if ( substr($className, -6) == "_Addon" ) {
-        $file = APPPATH . 'core/' . $className . '.php';
-        if ( file_exists($file) && is_file($file) ) {
-            @include_once( $file );
-        }
-    }
-});
-
-$routes_path = APPPATH . 'config/my_routes/';
-if (is_dir($routes_path)) {
-	$routes = scandir($routes_path);
-	foreach ($routes as $r_file)
-	{
-	    if ($r_file === '.' || $r_file === '..' || $r_file === 'index.html') {
-	        continue;
-	    }
-        $route_path = $routes_path . $r_file;
-        if (file_exists($route_path)) {
-            @include_once $route_path; 
-        }
-	} 
+require_once( BASEPATH .'database/DB.php');
+$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$url = rtrim($url, '/');
+$domain =  parse_url($url, PHP_URL_HOST);
+if (substr($domain, 0, 4) == 'www.') {
+	$domain = str_replace('www.', '', $domain);
+}
+$db =& DB();
+$saas_default = false;
+if ($db->table_exists("custom_domain")) {
+	$getURL = $db->select('count(id) as cid')->get_where('custom_domain', array('status' => 1, 'url' => $domain))->row()->cid;
+	if($getURL > 0 ) {
+		$route['authentication'] = 'authentication/index/$1';
+		$route['forgot'] = 'authentication/forgot/$1';
+		$route['teachers'] = 'home/teachers';
+		$route['events'] = 'home/events';
+		$route['news'] = 'home/news/';
+		$route['about'] = 'home/about';
+		$route['faq'] = 'home/faq';
+		$route['admission'] = 'home/admission';
+		$route['gallery'] = 'home/gallery';
+		$route['contact'] = 'home/contact';
+		$route['admit_card'] = 'home/admit_card';
+		$route['exam_results'] = 'home/exam_results';
+		$route['certificates'] = 'home/certificates';
+		$route['page/(:any)'] = 'home/page/$1';
+		$route['gallery_view/(:any)'] = 'home/gallery_view/$1';
+		$route['event_view/(:num)'] = 'home/event_view/$1';
+		$route['news_view/(:any)'] = 'home/news_view/$1';
+		$route['default_controller'] = 'home/index';
+	} else {
+		$saas_default = true;
+	}
+} else {
+	$saas_default = true;
 }
 
 $route['(:any)/authentication'] = 'authentication/index/$1';
@@ -121,11 +134,12 @@ $route['live_class'] = 'live_class/index';
 $route['exam'] = 'exam/index';
 $route['profile'] = 'profile/index';
 $route['sections'] = 'sections/index';
+$route['subscription_review/(:num)'] = 'saas_website/purchase_complete/$1';
 
 $route['authentication'] = 'authentication/index';
 $route['install'] = 'install/index';
 $route['404_override'] = 'errors';
-if (!empty($saas_default) && $saas_default == true) {
+if ($saas_default) {
 	$route['default_controller'] = 'saas_website/index';
 } else {
 	$route['default_controller'] = 'install';

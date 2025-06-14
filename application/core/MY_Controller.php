@@ -10,7 +10,22 @@ class MY_Controller extends CI_Controller
         if ($this->config->item('installed') == false) {
             redirect(site_url('install'));
         }
-        $get_config = $this->db->get_where('global_settings', array('id' => 1))->row_array();
+        
+        // Check database connection first
+        if (!$this->db->conn_id) {
+            show_error('Database connection failed. Please check your database configuration.', 500, 'Database Error');
+            return;
+        }
+        
+        // Add error handling for database query
+        try {
+            $get_config = $this->db->get_where('global_settings', array('id' => 1))->row_array();
+        } catch (Exception $e) {
+            // Handle database error gracefully
+            log_message('error', 'Database error in MY_Controller: ' . $e->getMessage());
+            show_error('Database query failed: ' . $e->getMessage(), 500, 'Database Error');
+            return;
+        }
         
         // cache control
         $this->output->set_header('Last-Modified: ' . gmdate("D, d M Y H:i:s") . ' GMT');
@@ -25,7 +40,12 @@ class MY_Controller extends CI_Controller
         // checkout branch information
         $branchID = $this->application_model->get_branch_id();
         if (!empty($branchID)) {
-            $branch = $this->db->select('currency_formats,symbol_position,symbol,currency,timezone')->where('id', $branchID)->get('branch')->row();
+            try {
+                $branch = $this->db->select('currency_formats,symbol_position,symbol,currency,timezone')->where('id', $branchID)->get('branch')->row();
+            } catch (Exception $e) {
+                log_message('error', 'Branch data error in MY_Controller: ' . $e->getMessage());
+                $branch = null;
+            }
             if ($branch) {
                 $get_config['currency'] = $branch->currency;
                 $get_config['currency_symbol'] = $branch->symbol;
@@ -43,7 +63,12 @@ class MY_Controller extends CI_Controller
         }
         
         $this->data['global_config'] = $get_config;
-        $this->data['theme_config'] = $this->db->get_where('theme_settings', array('id' => 1))->row_array();
+        try {
+            $this->data['theme_config'] = $this->db->get_where('theme_settings', array('id' => 1))->row_array();
+        } catch (Exception $e) {
+            log_message('error', 'Theme config error in MY_Controller: ' . $e->getMessage());
+            $this->data['theme_config'] = array();
+        }
         if (!is_null($get_config) && isset($get_config['timezone'])) {
             date_default_timezone_set($get_config['timezone']);
         } else {

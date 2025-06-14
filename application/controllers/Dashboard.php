@@ -22,6 +22,7 @@ class Dashboard extends Admin_Controller
 
     public function index()
     {
+
         if (is_student_loggedin() || is_parent_loggedin()) {
             $studentID = 0;
             if (is_student_loggedin()) {
@@ -52,25 +53,46 @@ class Dashboard extends Admin_Controller
                 $schoolID = get_loggedin_branch_id();
                 $this->data['title'] = get_type_name_by_id('branch', $schoolID) . " " . translate('branch_dashboard');
             }
-            $getSQLMode = $this->application_model->getSQLMode();
-            $this->data['school_id'] = $schoolID;
-            $this->data['sqlMode'] = $getSQLMode;
-            if ($getSQLMode == false) {
-                $this->data['fees_summary'] = $this->dashboard_model->annualFeessummaryCharts($schoolID);
-            } else {
+            try {
+                $getSQLMode = $this->application_model->getSQLMode();
+                $this->data['school_id'] = $schoolID;
+                $this->data['sqlMode'] = $getSQLMode;
+                if ($getSQLMode == false) {
+                    $this->data['fees_summary'] = $this->dashboard_model->annualFeessummaryCharts($schoolID);
+                } else {
+                    $this->data['fees_summary'] = array(
+                        'total_fee' => array_fill(0, 12, 0),
+                        'total_paid' => array_fill(0, 12, 0),
+                        'total_due' => array_fill(0, 12, 0),
+                    );
+                }
+            } catch (Exception $e) {
+                log_message('error', 'Dashboard data loading error: ' . $e->getMessage());
                 $this->data['fees_summary'] = array(
-                    'total_fee' => 0,
-                    'total_paid' => 0,
-                    'total_due' => 0,
+                    'total_fee' => array_fill(0, 12, 0),
+                    'total_paid' => array_fill(0, 12, 0),
+                    'total_due' => array_fill(0, 12, 0),
                 );
             }
-            $this->data['student_by_class'] = $this->dashboard_model->getStudentByClass($schoolID);
-            $this->data['income_vs_expense'] = $this->dashboard_model->getIncomeVsExpense($schoolID);
-            $this->data['weekend_attendance'] = $this->dashboard_model->getWeekendAttendance($schoolID);
-            $this->data['get_monthly_admission'] = $this->dashboard_model->getMonthlyAdmission($schoolID);
-            $this->data['get_voucher'] = $this->dashboard_model->getVoucher($schoolID);
-            $this->data['get_transport_route'] = $this->dashboard_model->get_transport_route($schoolID);
-            $this->data['get_total_student'] = $this->dashboard_model->get_total_student($schoolID);
+            try {
+                $this->data['student_by_class'] = $this->dashboard_model->getStudentByClass($schoolID);
+                $this->data['income_vs_expense'] = $this->dashboard_model->getIncomeVsExpense($schoolID);
+                $this->data['weekend_attendance'] = $this->dashboard_model->getWeekendAttendance($schoolID);
+                $this->data['get_monthly_admission'] = $this->dashboard_model->getMonthlyAdmission($schoolID);
+                $this->data['get_voucher'] = $this->dashboard_model->getVoucher($schoolID);
+                $this->data['get_transport_route'] = $this->dashboard_model->get_transport_route($schoolID);
+                $this->data['get_total_student'] = $this->dashboard_model->get_total_student($schoolID);
+            } catch (Exception $e) {
+                log_message('error', 'Dashboard statistics loading error: ' . $e->getMessage());
+                // Set safe defaults
+                $this->data['student_by_class'] = array();
+                $this->data['income_vs_expense'] = array();
+                $this->data['weekend_attendance'] = array();
+                $this->data['get_monthly_admission'] = 0;
+                $this->data['get_voucher'] = 0;
+                $this->data['get_transport_route'] = 0;
+                $this->data['get_total_student'] = 0;
+            }
             $this->data['sub_page'] = 'dashboard/index';
         }
         $language = 'en';

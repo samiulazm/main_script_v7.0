@@ -39,16 +39,13 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * CodeIgniter Driver Library Class
- *
- * This class enables you to create "Driver" libraries that add runtime ability
- * to extend the capabilities of a class via additional driver objects
+ * Driver Library Class
  *
  * @package		CodeIgniter
  * @subpackage	Libraries
  * @category	Libraries
  * @author		EllisLab Dev Team
- * @link
+ * @link		https://codeigniter.com/userguide3/general/drivers.html
  */
 #[AllowDynamicProperties]
 class CI_Driver_Library {

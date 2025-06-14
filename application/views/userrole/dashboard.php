@@ -1,3 +1,5 @@
+<?php 
+if ($this->saas_model->checkSubscriptionValidity()) { ?>
 <?php if (empty($student_id)): ?>
 	<div class="row">
 		<?php
@@ -376,3 +378,8 @@ else :
 	})(jQuery);
 </script>
 <?php endif;?>
+<?php } else { ?>
+    <div class="alert alert-danger">
+        <?php echo $this->saas_model->getSubscriptionsExpiredNotification(); ?>
+    </div>
+<?php } ?>

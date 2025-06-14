@@ -257,7 +257,7 @@ class Home_model extends MY_Model
             $this->db->select('count(staff.id) as snumber');
             $this->db->from('staff');
             $this->db->join('login_credential', 'login_credential.user_id = staff.id', 'inner');
-            $this->db->where_not_in('login_credential.role', 1);
+            $this->db->where_not_in('login_credential.role', array(1));
             if ($type == 'teacher') {
                 $this->db->where('login_credential.role', 3);
             } else {

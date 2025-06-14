@@ -358,6 +358,67 @@
 		$('#recaptcha_site_key').hide(); 
 		$('#recaptcha_secret_key').hide(); 
 	<?php } ?>
+
+	// === TEMPORARY DEBUG CODE ===
+	console.log("Frontend settings page loaded");
+	console.log("Form exists:", $('.frm-submit-data').length > 0);
+	
+	// Track form submission
+	$('.frm-submit-data').on('submit', function(e) {
+		console.log("=== FORM SUBMIT DEBUG ===");
+		console.log("Form submitted at:", new Date().toLocaleTimeString());
+		console.log("Form action:", $(this).attr('action'));
+		console.log("CMS Frontend Status:", $('input[name="cms_frontend_status"]:checked').val());
+		console.log("Form method:", $(this).attr('method'));
+		
+		// Check required fields
+		var requiredEmpty = [];
+		$(this).find('input[required], textarea[required], select[required]').each(function() {
+			if (!$(this).val()) {
+				requiredEmpty.push($(this).attr('name') || 'unnamed field');
+			}
+		});
+		
+		if (requiredEmpty.length > 0) {
+			console.log("Required fields empty:", requiredEmpty);
+		} else {
+			console.log("All required fields filled");
+		}
+	});
+	
+	// Track button clicks
+	$('button[type="submit"]').on('click', function(e) {
+		console.log("=== SUBMIT BUTTON CLICKED ===");
+		console.log("Button clicked at:", new Date().toLocaleTimeString());
+		console.log("Button text:", $(this).text().trim());
+		
+		// Check if CMS Frontend is selected
+		var frontendStatus = $('input[name="cms_frontend_status"]:checked').val();
+		console.log("CMS Frontend Status when clicked:", frontendStatus);
+		
+		if (!frontendStatus) {
+			console.warn("WARNING: No CMS Frontend status selected!");
+		}
+	});
+	
+	// Monitor AJAX requests
+	$(document).ajaxSend(function(event, jqxhr, settings) {
+		if (settings.url.includes('frontend/setting/save')) {
+			console.log("=== AJAX REQUEST SENT ===");
+			console.log("URL:", settings.url);
+			console.log("Method:", settings.type);
+			console.log("Data type:", settings.dataType);
+		}
+	});
+	
+	$(document).ajaxComplete(function(event, jqxhr, settings) {
+		if (settings.url.includes('frontend/setting/save')) {
+			console.log("=== AJAX RESPONSE RECEIVED ===");
+			console.log("Status:", jqxhr.status);
+			console.log("Response:", jqxhr.responseText);
+		}
+	});
+	// === END DEBUG CODE ===
 </script>
 
 <?php endif; ?>

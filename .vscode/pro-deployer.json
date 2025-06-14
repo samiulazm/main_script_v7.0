@@ -5,7 +5,7 @@
 	"autoDelete": true,
 	"checkGitignore": false,
 	"activeTargets": [
-		"My SFTP"
+		"My FTP"
 	],
 	"concurrency": 5,
 	"ignore": [
