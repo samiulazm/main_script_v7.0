@@ -156,12 +156,12 @@ per-request key and/or account:
 
 ```php
 $customers = $stripe->customers->all([],[
-    'api_key' => 'sk_test_...',
+    'api_key' => '...',
     'stripe_account' => 'acct_...'
 ]);
 
 $stripe->customers->retrieve('cus_123456789', [], [
-    'api_key' => 'sk_test_...',
+    'api_key' => '...',
     'stripe_account' => 'acct_...'
 ]);
 ```
