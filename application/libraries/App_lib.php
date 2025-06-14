@@ -368,7 +368,11 @@ class App_lib
 
     public function getRoles($arra_id = [1, 6, 7])
     {
-        if ($arra_id !='all') {
+        // Allow passing a single role id as integer or string
+        if ($arra_id !== 'all') {
+            if (!is_array($arra_id)) {
+                $arra_id = [$arra_id];
+            }
             $this->CI->db->where_not_in('id', $arra_id);
         }
         $rolelist = $this->CI->db->get('roles')->result();

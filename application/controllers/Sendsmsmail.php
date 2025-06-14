@@ -370,7 +370,7 @@ class Sendsmsmail extends Admin_Controller
     }
 
     // edit send sms mail template
-    public function template_edit($type = '', $id)
+    public function template_edit($type = '', $id = null)
     {
         $typeA = array('email', 'sms');
         $result = in_array($type, $typeA);
