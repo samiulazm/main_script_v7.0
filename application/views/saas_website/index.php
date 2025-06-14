@@ -79,6 +79,270 @@
             });
         });
     </script>
+
+    <!-- Custom Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .navbar-area .nav-inner .navbar .navbar-brand img {
+            max-width: 180px;
+        }
+        .section-title h2 {
+            font-weight: 600;
+        }
+        .btn {
+            border-radius: 50px;
+            padding: 14px 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .btn.btn-alt {
+            background-color: #fff;
+            color: var(--thm-primary);
+            border: 2px solid var(--thm-primary);
+        }
+        .btn.btn-alt:hover {
+            background-color: var(--thm-primary);
+            color: #fff;
+        }
+        .hero-area {
+             padding: 220px 0;
+        }
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 700;
+        }
+        .single-feature {
+            padding: 40px 30px;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        .single-feature:hover {
+             transform: translateY(-10px);
+             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .single-feature i {
+            font-size: 40px;
+            color: var(--thm-primary);
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .pp-plans {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all .3s ease;
+        }
+        .pp-plans:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        }
+        .pp-plans-featured-label {
+             background-color: var(--thm-primary);
+        }
+        .pp-plans .plans-purchase {
+            border-radius: 50px;
+            width: 100%;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            background-color: #f8f9fa;
+        }
+        .single-testimonial {
+            background: #fff;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px -15px rgba(0,0,0,0.1);
+            margin: 15px;
+            text-align: center;
+        }
+        .single-testimonial .text p {
+            font-style: italic;
+            color: #555;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+        .single-testimonial .author {
+            margin-top: 25px;
+        }
+        .single-testimonial .author img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .single-testimonial .author .name {
+            font-weight: 600;
+            color: #333;
+            font-size: 18px;
+        }
+        .single-testimonial .author .deg {
+            display: block;
+            color: var(--thm-primary);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .contact-form {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+        .footer .f-link ul li a i {
+            margin-right: 10px;
+        }
+        .footer .social li a {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+        }
+        /* Brands Section */
+        .brands {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .brands-logo-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        .brand-logo {
+            margin: 15px 25px;
+            text-align: center;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        .brand-logo:hover {
+            opacity: 1;
+        }
+        .brand-logo img {
+            max-width: 140px;
+            filter: grayscale(100%);
+        }
+        .brand-logo:hover img {
+            filter: grayscale(0%);
+        }
+
+        /* Hero Shapes */
+        .hero-area {
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-area .container {
+            position: relative;
+            z-index: 2;
+        }
+        .hero-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            animation: hero-shapes 20s infinite linear;
+            bottom: -100px;
+        }
+        .hero-shapes .shape-1 {
+            width: 120px;
+            height: 120px;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        .hero-shapes .shape-2 {
+            width: 50px;
+            height: 50px;
+            left: 25%;
+            animation-delay: 4s;
+        }
+        .hero-shapes .shape-3 {
+            width: 80px;
+            height: 80px;
+            right: 20%;
+            animation-delay: 8s;
+        }
+        .hero-shapes .shape-4 {
+            width: 60px;
+            height: 60px;
+            right: 5%;
+            animation-delay: 12s;
+        }
+        @keyframes hero-shapes {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-120vh) scale(1.2) rotate(360deg);
+            }
+        }
+
+        /* Feature section style update */
+        .features .single-feature {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 25px 5px !important;
+            margin-bottom: 0 !important;
+            text-align: left !important;
+            border-top: 1px solid #f0f0f0;
+            transition: none !important;
+            border-radius: 0 !important;
+        }
+        .features .col-lg-4:nth-child(1) .single-feature,
+        .features .col-lg-4:nth-child(2) .single-feature,
+        .features .col-lg-4:nth-child(3) .single-feature {
+            border-top: none;
+        }
+
+        .features .single-feature:hover {
+             transform: none !important;
+             box-shadow: none !important;
+        }
+
+        .features .single-feature .icon {
+            display: block !important;
+            float: left;
+            margin-right: 15px !important;
+            font-size: 24px !important;
+            color: #E91E63 !important;
+            width: 55px;
+            height: 55px;
+            line-height: 55px;
+            text-align: center;
+            background: rgba(233, 30, 99, 0.1) !important;
+            border-radius: 50% !important;
+            margin-bottom: 0 !important;
+        }
+        .feature-content {
+             overflow: hidden;
+        }
+        .features .single-feature h3 {
+            font-size: 18px !important;
+            font-weight: 600;
+            margin-top: 0px;
+            margin-bottom: 5px;
+        }
+        .features .single-feature p {
+            color: #666;
+            font-size: 14px !important;
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+    </style>
 </head>
 <body>
     <!-- Preloader -->
@@ -113,6 +377,9 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="#pricing" class="page-scroll" aria-label="Toggle navigation"><?php echo translate('pricing'); ?></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#testimonials" class="page-scroll" aria-label="Toggle navigation">Testimonials</a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="#faq" class="page-scroll" aria-label="Toggle navigation"><?php echo translate('faq'); ?></a>
@@ -156,6 +423,12 @@
 
     <!-- Start Slider Area -->
     <section id="home" class="hero-area" style="background-image: url(<?php echo base_url('assets/frontend/images/saas/' . $getSettings->slider_bg_image) ?>);">
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-5 col-md-12 col-12">
@@ -185,42 +458,274 @@
     </section>
     <!-- End Slider Area -->
 
+    <!-- Start Brands Area -->
+    <section id="brands" class="brands">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h4 style="text-transform: uppercase; font-weight: 600; color: #aaa; font-size: 16px; letter-spacing: 1px;">
+                        Trusted by Leading Educational Institutions in Bangladesh
+                    </h4>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-lg-12">
+                    <div class="brands-logo-wrapper">
+                        <div class="brand-logo">
+                            <img src="https://placehold.co/150x60/f0f0f0/ccc?text=Ideal+School" alt="Ideal School and College">
+                        </div>
+                        <div class="brand-logo">
+                            <img src="https://placehold.co/150x60/f0f0f0/ccc?text=Dhaka+Residential" alt="Dhaka Residential Model College">
+                        </div>
+                        <div class="brand-logo">
+                            <img src="https://placehold.co/150x60/f0f0f0/ccc?text=Viqarunnisa+Noon" alt="Viqarunnisa Noon School">
+                        </div>
+                        <div class="brand-logo">
+                            <img src="https://placehold.co/150x60/f0f0f0/ccc?text=Rajuk+Uttara" alt="Rajuk Uttara Model School & College">
+                        </div>
+                        <div class="brand-logo">
+                            <img src="https://placehold.co/150x60/f0f0f0/ccc?text=St.+Joseph" alt="St. Joseph Higher Secondary School">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Brands Area -->
+
     <!-- Start Features Area -->
     <section id="features" class="features section" style="background-image: url(<?php echo base_url('assets/frontend/images/saas/features-bg.png') ?>)">
         <div class="container">
             <div class="row">
                 <div class="col-12">
                     <div class="section-title">
-                        <h3 class="wow zoomIn" data-wow-delay=".2s"><?php echo translate('features'); ?></h3>
-                        <h2 class="wow fadeInUp" data-wow-delay=".4s"><?php echo $getSettings->feature_title; ?></h2>
-                        <p class="wow fadeInUp" data-wow-delay=".6s"><?php echo $getSettings->feature_description; ?></p>
+                        <h3 class="wow zoomIn" data-wow-delay=".2s">Features</h3>
+                        <h2 class="wow fadeInUp" data-wow-delay=".4s">Countless Key Features</h2>
+                        <p class="wow fadeInUp" data-wow-delay=".6s">We have highlighted some exceptional and unique features of our system. Using our app will create an experience you won't find in any other script. Also our system has many more useful modules and features, for that you can check our demo carefully.</p>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <?php
-                $delaycount = .2;
-                $count = 0;
-                foreach ($featureslist as $key => $feature) {
-                    ?>
                 <div class="col-lg-4 col-md-6 col-12">
                     <!-- Start Single Feature -->
-                    <div class="single-feature wow fadeInUp" data-wow-delay="<?php echo $delaycount ?>s">
-                        <i class="<?php echo $feature->icon; ?>"></i>
-                        <h3><?php echo $feature->title; ?></h3>
-                        <p><?php echo $feature->description; ?></p>
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-school-flag"></i></span>
+                        <div class="feature-content">
+                            <h3>School Subscription (Saas)</h3>
+                            <p>The best solution to start your school business
+    with powerful Saas modules.</p>
+                        </div>
                     </div>
                     <!-- End Single Feature -->
                 </div>
-                <?php
-                    if ($count < 2) {
-                        $count++;
-                        $delaycount += .2;
-                    } else {
-                        $count = 0;
-                        $delaycount = .2;
-                    } 
-                } ?>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.4s">
+                       <span class="icon"><i class="fas fa-link"></i></span>
+                        <div class="feature-content">
+                            <h3>Custom Domains</h3>
+                            <p>Allow your users to use their own domain name instead of the default URL.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-qrcode"></i></span>
+                        <div class="feature-content">
+                            <h3>QR Attendance</h3>
+                            <p>Attendance taking facility by scanning the QR code of student or employee ID card.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-shield-halved"></i></span>
+                        <div class="feature-content">
+                            <h3>Two Factor Authentication</h3>
+                            <p>That helps enhance the security of your Ramom school accounts.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.4s">
+                       <span class="icon"><i class="fas fa-coins"></i></span>
+                        <div class="feature-content">
+                            <h3>Powerfull Fees Management</h3>
+                            <p>You can maintain your institution student fees in very flexible way (Discount, Fine, Fee reminder).</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-laptop-file"></i></span>
+                        <div class="feature-content">
+                            <h3>Online Exam (Paid/Free)</h3>
+                            <p>Admin/teacher can manage online exam and student can participate. Also can offer <strong>free and paid</strong>.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-credit-card"></i></span>
+                        <div class="feature-content">
+                            <h3>Accept Payments</h3>
+                            <p>Our System accept <strong>Online / Offline</strong> Online payments from your bKash, Nagad, Rocket, etc. </p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.4s">
+                       <span class="icon"><i class="fas fa-globe"></i></span>
+                        <div class="feature-content">
+                            <h3>Advance Website</h3>
+                            <p>This School management system has powerful frontend and highly customizable.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-layer-group"></i></span>
+                        <div class="feature-content">
+                            <h3>Multi-Type of Exam System</h3>
+                            <p>You can set three types of Exam (<strong>Mark, GPA, Mark & GPA</strong>). Multi type of mark distribution.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-money-check-dollar"></i></span>
+                        <div class="feature-content">
+                            <h3>Online Payment Gateway</h3>
+                            <p>Our system has more than 13 popular  payment gateways available.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.4s">
+                       <span class="icon"><i class="fas fa-calculator"></i></span>
+                        <div class="feature-content">
+                            <h3>Office Accounting</h3>
+                            <p>Record Expenses & Income and Free Collection can be automatically linked to Office accounts.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-video"></i></span>
+                        <div class="feature-content">
+                            <h3>Online Live Class</h3>
+                            <p><strong>Zoom meeting, BigBlueButton And Gmeet</strong> are integrated into our system for live classes.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-user-plus"></i></span>
+                        <div class="feature-content">
+                            <h3>Online Admission</h3>
+                            <p>Students can apply for online  admission and <strong>pay admission fee</strong> through the website.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-square-plus"></i></span>
+                        <div class="feature-content">
+                            <h3>Custom Field</h3>
+                            <p>You can add custom fields in student, employee, online admission form as per your requirement.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.4s">
+                       <span class="icon"><i class="fas fa-chart-line"></i></span>
+                        <div class="feature-content">
+                            <h3>Progress Report Card</h3>
+                            <p>The results of multiple terms  exam can be combined to make a progress card (<strong>with cumulative average, class Average, subject position</strong>).</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-users-gear"></i></span>
+                        <div class="feature-content">
+                            <h3>Role Permission</h3>
+                            <p>Our system has <strong>8 types of roles</strong> by default and you can add roles according to your needs and manage their permissions.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-calendar-check"></i></span>
+                        <div class="feature-content">
+                            <h3>Schedule Email / SMS</h3>
+                            <p>You can send bulk sms or email to users and you can set the time and date schedule according to your needs.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.4s">
+                       <span class="icon"><i class="fas fa-boxes-stacked"></i></span>
+                        <div class="feature-content">
+                            <h3>Inventory Module</h3>
+                            <p>An inventory management modules is a powerful tool that businesses utilize to efficiently monitor, control, and optimize their inventory.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.6s">
+                       <span class="icon"><i class="fas fa-id-card"></i></span>
+                        <div class="feature-content">
+                            <h3>Card Management</h3>
+                            <p>With this module you can easily create your own template and use it to create Student ID Card, Admit Card, Certificate and Employee ID Card.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
+                </div>
+                <div class="col-lg-4 col-md-6 col-12">
+                    <!-- Start Single Feature -->
+                    <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">
+                       <span class="icon"><i class="fas fa-mobile-screen-button"></i></span>
+                        <div class="feature-content">
+                            <h3>Progressive Web App (PWA)</h3>
+                            <p>A progressive web app (PWA) is an app that's built using web platform technologies, but that provides a user experience like that of a platform-specific app.</p>
+                        </div>
+                    </div>
+                    <!-- End Single Feature -->
                 </div>
             </div>
         </div>
@@ -319,6 +824,63 @@
         <div class="bg-ring-right"></div>
     </section>
     <!--/ End Pricing Table Area -->
+
+    <!-- Start Testimonials Area -->
+    <section id="testimonials" class="testimonials section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-title">
+                        <h3 class="wow zoomIn" data-wow-delay=".2s">Testimonials</h3>
+                        <h2 class="wow fadeInUp" data-wow-delay=".4s">What Our Clients Say</h2>
+                        <p class="wow fadeInUp" data-wow-delay=".6s">Discover how schools have streamlined their management, communication, and learning processes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-12 wow fadeInUp" data-wow-delay=".4s">
+                    <div class="single-testimonial">
+                        <div class="author">
+                            <img src="https://placehold.co/80x80/6e8fd4/fff?text=AR" alt="Abdur Rahman">
+                            <h4 class="name">Abdur Rahman
+                                <span class="deg">Principal, Ideal School and College</span>
+                            </h4>
+                        </div>
+                        <div class="text">
+                            <p>"This software is a game-changer. Our administrative workload has reduced by half, and communication with parents is seamless."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-12 wow fadeInUp" data-wow-delay=".6s">
+                    <div class="single-testimonial">
+                        <div class="author">
+                            <img src="https://placehold.co/80x80/6e8fd4/fff?text=FS" alt="Fatima Sultana">
+                            <h4 class="name">Fatima Sultana
+                                <span class="deg">IT Coordinator, Viqarunnisa Noon School</span>
+                            </h4>
+                        </div>
+                        <div class="text">
+                            <p>"Incredibly intuitive and powerful. The support team is always responsive and helpful. Highly recommended for any educational institution in Bangladesh."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-12 wow fadeInUp" data-wow-delay=".8s">
+                    <div class="single-testimonial">
+                        <div class="author">
+                            <img src="https://placehold.co/80x80/6e8fd4/fff?text=SM" alt="Shamsul Islam">
+                            <h4 class="name">Shamsul Islam
+                                <span class="deg">Director, Notre Dame College</span>
+                            </h4>
+                        </div>
+                        <div class="text">
+                            <p>"The features for tracking student progress and managing fees are outstanding. It has brought a new level of efficiency to our institution."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Testimonials Area -->
 
     <!-- Start Faq Area -->
     <section class="faq section" id="faq">
@@ -474,6 +1036,7 @@
                                         <li><a href="#home" class="page-scroll active" aria-label="Toggle navigation"><i class="fas fa-angle-right"></i> <?php echo translate('home'); ?></a></li>
                                         <li><a href="#features" class="page-scroll" aria-label="Toggle navigation"><i class="fas fa-angle-right"></i> <?php echo translate('features'); ?></a></li>
                                         <li><a href="#pricing" class="page-scroll" aria-label="Toggle navigation"><i class="fas fa-angle-right"></i> <?php echo translate('pricing'); ?></a></li>
+                                        <li><a href="#testimonials" class="page-scroll" aria-label="Toggle navigation"><i class="fas fa-angle-right"></i> Testimonials</a></li>
                                         <li><a href="#faq" class="page-scroll" aria-label="Toggle navigation"><i class="fas fa-angle-right"></i> <?php echo translate('faq'); ?></a></li>
                                         <li><a href="#contact" class="page-scroll" aria-label="Toggle navigation"><i class="fas fa-angle-right"></i> <?php echo translate('contact'); ?></a></li>
                                         <?php if ($getSettings->terms_status == 1) { ?>
