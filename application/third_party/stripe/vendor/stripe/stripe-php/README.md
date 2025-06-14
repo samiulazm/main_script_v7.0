@@ -52,7 +52,7 @@ If you use Composer, these dependencies should be handled automatically. If you 
 Simple usage looks like:
 
 ```php
-$stripe = new \Stripe\StripeClient('sk_test_...');
+$stripe = new \Stripe\StripeClient('');
 $customer = $stripe->customers->create([
     'description' => 'example customer',
     'email' => 'email@example.com',
@@ -154,17 +154,6 @@ For apps that need to use multiple keys during the lifetime of a process, like
 one that uses [Stripe Connect][connect], it's also possible to set a
 per-request key and/or account:
 
-```php
-$customers = $stripe->customers->all([],[
-    'api_key' => '...',
-    'stripe_account' => 'acct_...'
-]);
-
-$stripe->customers->retrieve('cus_123456789', [], [
-    'api_key' => '...',
-    'stripe_account' => 'acct_...'
-]);
-```
 
 ### Configuring CA Bundles
 
@@ -224,7 +213,7 @@ Stripe::addBetaVersion("feature_beta", "v3");
 If you would like to send a request to an undocumented API (for example you are in a private beta), or if you prefer to bypass the method definitions in the library and specify your request details directly, you can use the `rawRequest` method on the StripeClient.
 
 ```php
-$stripe = new \Stripe\StripeClient('sk_test_...');
+$stripe = new \Stripe\StripeClient('');
 $response = $stripe->rawRequest('post', '/v1/beta_endpoint', [
   "caveat": "emptor"
 ], [
@@ -324,7 +313,7 @@ A simple example of charging a customer $10:
 
 ```php
 // This is your test secret API key.
-\Stripe\Stripe::setApiKey('sk_test_...');
+\Stripe\Stripe::setApiKey();
 $token = $_POST['stripeToken'];
 // ... existing code ...
 $charge = \Stripe\Charge::create([
@@ -339,7 +328,7 @@ Or, when using with a [Stripe Connect](https://stripe.com/connect) platform, you
 
 ```php
 // This is your test secret API key.
-\Stripe\Stripe::setApiKey('sk_test_...');
+\Stripe\Stripe::setApiKey();
 
 $charge = \Stripe\Charge::create([
     'amount' => 1000,
@@ -353,7 +342,7 @@ $charge = \Stripe\Charge::create([
 You can also use the `StripeClient` class, which is a more modern and robust way to interact with the Stripe API:
 
 ```php
-$stripe = new \Stripe\StripeClient('sk_test_...');
+$stripe = new \Stripe\StripeClient();
 
 $stripe->charges->create([
   'amount' => 2000,
