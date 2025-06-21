@@ -788,6 +788,11 @@ class Student extends Admin_Controller
         }
     }
 
+    /**
+     * Returns the details of a student document as a JSON object.
+     *
+     * Expects a POST parameter 'id' specifying the document ID.
+     */
     public function document_details()
     {
         $id = $this->input->post('id');
@@ -798,7 +803,9 @@ class Student extends Admin_Controller
     }
 
     /**
-     * Secure file downloader with enhanced validation
+     * Handles secure downloading of student document files with comprehensive validation and access control.
+     *
+     * Validates the requested file name, prevents directory traversal, checks database and filesystem existence, enforces file size limits, and ensures the user has permission to access the file before serving it for download.
      */
     public function documents_download()
     {
@@ -897,10 +904,12 @@ class Student extends Admin_Controller
     }
 
     /**
-     * Check if current user can access the specified file
+     * Determines whether the current user has permission to access a student's file.
      *
-     * @param int $student_id Student ID from file record
-     * @return bool Access permission
+     * Admins and superadmins have access to all files. Students can access only their own files. Parents can access files belonging to their children.
+     *
+     * @param int $student_id The ID of the student associated with the file.
+     * @return bool True if the user has access; otherwise, false.
      */
     private function canAccessFile($student_id)
     {

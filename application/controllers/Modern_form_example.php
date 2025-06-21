@@ -15,6 +15,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Modern_form_example extends Admin_Controller {
 
+    /**
+     * Initializes the controller with security helpers, validation library, and security configuration.
+     */
     public function __construct() {
         parent::__construct();
         $this->load->helper('security');
@@ -22,8 +25,10 @@ class Modern_form_example extends Admin_Controller {
         $this->load->config('security_modern');
     }
 
-    /**
-     * Example: Modern Student Registration Form
+    /****
+     * Handles student registration with validation, CSRF protection, and rate limiting.
+     *
+     * Processes POST requests for student registration by validating input data, enforcing security measures, and saving valid student records to the database. Returns JSON responses for success, validation errors, or security issues. For GET requests, loads the student registration form view with a CSRF token.
      */
     public function student_registration() {
         if (!get_permission('student', 'is_add')) {
@@ -154,8 +159,10 @@ class Modern_form_example extends Admin_Controller {
         $this->load->view('admin/layout/index', $this->data);
     }
 
-    /**
-     * Example: Modern File Upload Form
+    /****
+     * Handles secure document upload for students with validation, CSRF protection, and rate limiting.
+     *
+     * For POST requests, validates permissions, CSRF token, rate limits, and file upload parameters. Processes the file upload if valid and returns a JSON response indicating success or error. For non-POST requests, loads the document upload form view with a CSRF token.
      */
     public function document_upload() {
         if (!get_permission('student', 'is_edit')) {
@@ -264,7 +271,10 @@ class Modern_form_example extends Admin_Controller {
     }
 
     /**
-     * Sanitize form data
+     * Returns a sanitized version of the provided form data array, applying field-specific sanitization rules for email, phone, admission number, and names.
+     *
+     * @param array $data The form data to sanitize.
+     * @return array The sanitized data array.
      */
     private function sanitizeFormData($data) {
         $sanitized = [];
@@ -294,7 +304,12 @@ class Modern_form_example extends Admin_Controller {
     }
 
     /**
-     * Prepare student data for database insertion
+     * Formats and prepares student registration data for database insertion.
+     *
+     * Hashes the password, sets the creation timestamp, and assigns the current user's branch ID.
+     *
+     * @param array $data The sanitized student registration data.
+     * @return array The prepared data array ready for database insertion.
      */
     private function prepareStudentData($data) {
         return [
@@ -311,7 +326,10 @@ class Modern_form_example extends Admin_Controller {
     }
 
     /**
-     * Save student to database
+     * Inserts a new student record into the database.
+     *
+     * @param array $data The student data to be inserted.
+     * @return int The ID of the newly inserted student record.
      */
     private function saveStudent($data) {
         $this->db->insert('students', $data);
@@ -319,7 +337,12 @@ class Modern_form_example extends Admin_Controller {
     }
 
     /**
-     * Process file upload
+     * Handles uploading a file to the student documents directory with a secure, randomly generated filename.
+     *
+     * Moves the uploaded file to a secure directory, creating the directory if it does not exist. Returns an array indicating success with the new filename and original name, or failure with an error message.
+     *
+     * @param array $file The uploaded file information from the $_FILES array.
+     * @return array An array with 'success' (bool), and on success, 'filename' and 'original_name'; on failure, 'error'.
      */
     private function processFileUpload($file) {
         $upload_path = './uploads/student_documents/';

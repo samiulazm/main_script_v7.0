@@ -84,8 +84,10 @@ window.theme.fn = {
 	const ANIMATION_SPEED = 300; // Configurable animation speed
 
 	/**
-	 * Expand navigation item with accessibility support
-	 * @param {jQuery} $li - Navigation item to expand
+	 * Expands a navigation item, revealing its child menu with animation and updating accessibility attributes.
+	 * 
+	 * Adds ARIA attributes to indicate expanded state, animates the display of child navigation elements, and ensures the expanded item is visible within its container.
+	 * @param {jQuery} $li - The navigation list item to expand.
 	 */
 	function expand($li) {
 		const $children = $li.children('ul.nav-children');
@@ -102,8 +104,10 @@ window.theme.fn = {
 	}
 
 	/**
-	 * Collapse navigation item with accessibility support
-	 * @param {jQuery} $li - Navigation item to collapse
+	 * Collapses a navigation item, hiding its child menu with animation and updating accessibility attributes.
+	 * 
+	 * Sets ARIA attributes to indicate the item is collapsed and removes the `nav-expanded` class after the animation completes.
+	 * @param {jQuery} $li - The navigation list item to collapse.
 	 */
 	function collapse($li) {
 		const $children = $li.children('ul.nav-children');
@@ -119,8 +123,9 @@ window.theme.fn = {
 	}
 
 	/**
-	 * Ensure navigation item is visible in viewport
-	 * @param {jQuery} $li - Navigation item to make visible
+	 * Scrolls the navigation container to ensure the specified item is visible within the viewport.
+	 * @param {jQuery} $li - The navigation item to bring into view.
+	 * @returns {boolean|undefined} Returns false if the navigation container is not found; otherwise, undefined.
 	 */
 	function ensureVisible($li) {
 		const scroller = $li.offsetParent();

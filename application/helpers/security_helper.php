@@ -13,11 +13,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 if (!function_exists('sanitize_input')) {
     /**
-     * Sanitize input data with multiple filters
-     * 
-     * @param mixed $data Input data to sanitize
-     * @param string $type Type of sanitization (email, url, string, int, float)
-     * @return mixed Sanitized data
+     * Recursively sanitizes input data according to the specified type.
+     *
+     * Supports sanitization for email, URL, integer, float, phone number, alphanumeric, filename, and generic string types. Arrays are sanitized recursively.
+     *
+     * @param mixed $data The input data to sanitize; can be a scalar value or an array.
+     * @param string $type The type of sanitization to apply: 'email', 'url', 'int', 'float', 'phone', 'alphanumeric', 'filename', or 'string' (default).
+     * @return mixed The sanitized data, matching the structure of the input.
      */
     function sanitize_input($data, $type = 'string') {
         if (is_array($data)) {
@@ -52,9 +54,9 @@ if (!function_exists('sanitize_input')) {
 
 if (!function_exists('validate_csrf_token')) {
     /**
-     * Validate CSRF token
-     * 
-     * @return bool True if valid
+     * Validates the CSRF token using CodeIgniter's security library.
+     *
+     * @return bool True if the CSRF token is valid, false otherwise.
      */
     function validate_csrf_token() {
         $CI =& get_instance();
@@ -64,10 +66,12 @@ if (!function_exists('validate_csrf_token')) {
 
 if (!function_exists('generate_secure_token')) {
     /**
-     * Generate a secure random token
-     * 
-     * @param int $length Token length
-     * @return string Secure token
+     * Generates a cryptographically secure random token of the specified length.
+     *
+     * Uses the most secure available method for random byte generation, with a fallback for older PHP versions.
+     *
+     * @param int $length The desired length of the token.
+     * @return string The generated secure token.
      */
     function generate_secure_token($length = 32) {
         if (function_exists('random_bytes')) {
@@ -83,11 +87,13 @@ if (!function_exists('generate_secure_token')) {
 
 if (!function_exists('secure_file_path')) {
     /**
-     * Validate and secure file path
-     * 
-     * @param string $path File path to validate
-     * @param string $base_path Base directory path
-     * @return string|false Secure path or false if invalid
+     * Validates and secures a file path, ensuring it is within a specified base directory.
+     *
+     * Removes directory traversal patterns and checks that the resolved path is inside the base directory.
+     *
+     * @param string $path The file path to validate.
+     * @param string $base_path The base directory against which to validate the path.
+     * @return string|false The resolved secure path if valid, or false if the path is invalid or outside the base directory.
      */
     function secure_file_path($path, $base_path) {
         // Remove any directory traversal attempts
@@ -108,12 +114,14 @@ if (!function_exists('secure_file_path')) {
 
 if (!function_exists('rate_limit_check')) {
     /**
-     * Simple rate limiting check
-     * 
-     * @param string $key Rate limit key
-     * @param int $max_attempts Maximum attempts
-     * @param int $time_window Time window in seconds
-     * @return bool True if within limits
+     * Checks if the number of actions associated with a given key is within the allowed rate limit for the current session.
+     *
+     * Tracks the number of attempts and the time of the last attempt using session data. Resets the attempt count if the specified time window has elapsed.
+     *
+     * @param string $key Unique identifier for the rate-limited action.
+     * @param int $max_attempts Maximum allowed attempts within the time window.
+     * @param int $time_window Time window in seconds for rate limiting.
+     * @return bool True if the action is allowed (under the limit), false if the rate limit has been exceeded.
      */
     function rate_limit_check($key, $max_attempts = 5, $time_window = 900) {
         $CI =& get_instance();
@@ -147,12 +155,12 @@ if (!function_exists('rate_limit_check')) {
 
 if (!function_exists('validate_file_upload')) {
     /**
-     * Validate file upload security
-     * 
-     * @param array $file $_FILES array element
-     * @param array $allowed_types Allowed file types
-     * @param int $max_size Maximum file size in bytes
-     * @return array Validation result
+     * Validates an uploaded file for security by checking upload status, size, allowed extensions, and MIME type.
+     *
+     * @param array $file The uploaded file array (e.g., from $_FILES).
+     * @param array $allowed_types List of permitted file extensions (e.g., ['jpg', 'png']).
+     * @param int $max_size Maximum allowed file size in bytes.
+     * @return array Associative array with 'valid' (bool) and 'error' (string) keys indicating validation result.
      */
     function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) {
         $result = ['valid' => false, 'error' => ''];
@@ -216,11 +224,13 @@ if (!function_exists('validate_file_upload')) {
 
 if (!function_exists('log_security_event')) {
     /**
-     * Log security events
-     * 
-     * @param string $event Event description
-     * @param string $level Log level (error, warning, info)
-     * @param array $context Additional context
+     * Logs a security-related event with contextual information.
+     *
+     * Records the event description, user ID (if available), IP address, user agent, timestamp, and any additional context, and writes the data to the application log at the specified log level.
+     *
+     * @param string $event Description of the security event.
+     * @param string $level Log level to use ('error', 'warning', 'info'). Defaults to 'warning'.
+     * @param array $context Additional contextual data to include in the log entry.
      */
     function log_security_event($event, $level = 'warning', $context = []) {
         $CI =& get_instance();
@@ -241,10 +251,12 @@ if (!function_exists('log_security_event')) {
 
 if (!function_exists('hash_password_modern')) {
     /**
-     * Modern password hashing
-     * 
-     * @param string $password Plain text password
-     * @return string Hashed password
+     * Hashes a plaintext password using a secure algorithm.
+     *
+     * Uses PHP's `password_hash` with the default algorithm if available. Falls back to SHA-512 with the application's encryption key for older PHP versions.
+     *
+     * @param string $password The plaintext password to hash.
+     * @return string The resulting password hash.
      */
     function hash_password_modern($password) {
         if (function_exists('password_hash')) {
@@ -259,11 +271,13 @@ if (!function_exists('hash_password_modern')) {
 
 if (!function_exists('verify_password_modern')) {
     /**
-     * Modern password verification
-     * 
-     * @param string $password Plain text password
-     * @param string $hash Stored hash
-     * @return bool True if password matches
+     * Verifies a plaintext password against a stored hash using modern or legacy methods.
+     *
+     * Uses `password_verify` for modern hashes, or SHA-512 with the application's encryption key for legacy hashes.
+     *
+     * @param string $password The plaintext password to verify.
+     * @param string $hash The stored password hash.
+     * @return bool True if the password matches the hash, false otherwise.
      */
     function verify_password_modern($password, $hash) {
         // Check if it's a modern hash

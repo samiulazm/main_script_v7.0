@@ -13,6 +13,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Security_review extends Admin_Controller {
 
+    /**
+     * Initializes the Security_review controller by loading security helpers and configuration.
+     */
     public function __construct() {
         parent::__construct();
         $this->load->helper('security');
@@ -20,7 +23,9 @@ class Security_review extends Admin_Controller {
     }
 
     /**
-     * Security Dashboard
+     * Displays the Security Configuration Review dashboard for superadmins.
+     *
+     * Prepares and renders the security review interface, including overall security status, actionable recommendations, and recent security events. Access is restricted to superadmin users.
      */
     public function index() {
         if (!is_superadmin_loggedin()) {
@@ -37,7 +42,11 @@ class Security_review extends Admin_Controller {
     }
 
     /**
-     * Get overall security status
+     * Evaluates and returns the current security configuration status.
+     *
+     * Assesses key security features such as rate limiting, file upload security, password policy, CSRF protection, session security, security headers, security logging, and account lockout based on configuration settings. Returns an array with individual check results, scores, and an overall security score as a percentage.
+     *
+     * @return array An array containing the status of each security check, total and maximum possible scores, and the overall security score percentage.
      */
     private function getSecurityStatus() {
         $status = [
@@ -150,7 +159,11 @@ class Security_review extends Admin_Controller {
     }
 
     /**
-     * Get security recommendations
+     * Generates prioritized security improvement recommendations based on current configuration status.
+     *
+     * Analyzes the results of security checks and returns actionable recommendations for any areas scoring below the threshold, including suggested configuration changes and general audit advice if the overall security score is low.
+     *
+     * @return array List of recommendations, each containing priority, title, description, and suggested action.
      */
     private function getSecurityRecommendations() {
         $recommendations = [];
@@ -241,7 +254,9 @@ class Security_review extends Admin_Controller {
     }
 
     /**
-     * Get recent security events (mock data for demonstration)
+     * Returns a list of recent security events using mock data for demonstration purposes.
+     *
+     * @return array An array of recent security event records, each containing a timestamp, event description, IP address, and severity level.
      */
     private function getRecentSecurityEvents() {
         // In a real implementation, this would query the security logs
@@ -268,7 +283,9 @@ class Security_review extends Admin_Controller {
     }
 
     /**
-     * Export security configuration
+     * Exports the current security configuration as a JSON file for download.
+     *
+     * Only accessible to superadmins. The exported file includes key security settings such as rate limits, file upload rules, password policy, session security, CSRF protection, security headers, logging, and account lockout configuration.
      */
     public function export_config() {
         if (!is_superadmin_loggedin()) {
@@ -293,7 +310,9 @@ class Security_review extends Admin_Controller {
     }
 
     /**
-     * Test security configuration
+     * Performs runtime tests on key security features and returns the results as a JSON response.
+     *
+     * Tests include rate limiting, password hashing and verification, input sanitization, and secure file path validation. Only accessible to superadmins.
      */
     public function test_config() {
         if (!is_superadmin_loggedin()) {

@@ -9,7 +9,11 @@ class Faq extends Admin_Controller
         $this->load->model('frontend_model');
     }
 
-    // home features
+    /**
+     * Displays and manages the FAQ entries in the frontend CMS.
+     *
+     * Handles both GET and POST requests: displays the FAQ list and form on GET, and processes new FAQ submissions on POST with permission checks, CSRF protection, input validation, and secure data handling. Returns JSON responses for AJAX operations and loads the appropriate view for standard requests.
+     */
     public function index()
     {
         // check access permission

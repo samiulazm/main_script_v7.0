@@ -13,17 +13,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class MY_Model extends CI_Model {
 
 	/**
-	 * Constructor
+	 * Initializes the model by calling the parent constructor.
 	 */
 	public function __construct() {
 		parent::__construct();
 	}
 
 	/**
-	 * Modern password hashing using PHP's password_hash()
+	 * Generates a secure hash of the provided password.
 	 *
-	 * @param string $password Plain text password
-	 * @return string Hashed password
+	 * Uses PHP's password_hash() if available; otherwise, falls back to SHA-512 hashing with the application's encryption key for legacy compatibility.
+	 *
+	 * @param string $password The plain text password to hash.
+	 * @return string The resulting hashed password.
 	 */
 	public function hash($password) {
 		// Use modern password hashing for new passwords
@@ -35,11 +37,13 @@ class MY_Model extends CI_Model {
 	}
 
 	/**
-	 * Verify password against hash
+	 * Verifies a plain text password against a stored hash using modern or legacy hashing methods.
 	 *
-	 * @param string $password Plain text password
-	 * @param string $hash Stored hash
-	 * @return bool
+	 * Uses PHP's password_verify() for modern hashes, or compares a SHA-512 hash with the encryption key for legacy hashes.
+	 *
+	 * @param string $password The plain text password to verify.
+	 * @param string $hash The stored password hash.
+	 * @return bool True if the password matches the hash, false otherwise.
 	 */
 	public function verify_password($password, $hash) {
 		// Check if it's a modern hash
@@ -51,11 +55,13 @@ class MY_Model extends CI_Model {
 	}
 	
 	/**
-	 * Modern and secure image upload with validation
+	 * Handles secure image uploads for a specified user role with validation.
 	 *
-	 * @param string $role User role for directory structure
-	 * @param string $fields Form field name
-	 * @return string Uploaded file name or default
+	 * Validates the user role, enforces allowed image types and size limits, ensures the upload directory exists, and securely deletes the previous user photo if applicable. Returns the new uploaded filename, the previous photo if no new upload occurred, or a default image name on failure.
+	 *
+	 * @param string $role The user role used to determine the upload directory (must be one of: student, teacher, admin, parent, staff).
+	 * @param string $fields The form field name containing the image file.
+	 * @return string The uploaded file name, the previous photo name, or 'default.png' if upload fails.
 	 */
 	public function uploadImage($role, $fields = "user_photo") {
 		$return_photo = 'default.png'; // Fixed typo
@@ -115,14 +121,16 @@ class MY_Model extends CI_Model {
 	}
 
 	/**
-	 * Modern database get method with enhanced security and performance
+	 * Retrieves records from a database table with optional filtering and branch-based access control.
 	 *
-	 * @param string $table Table name
-	 * @param array|null $where_array Where conditions
-	 * @param bool $single Return single row
-	 * @param bool $branch Apply branch filtering
-	 * @param string $columns Columns to select
-	 * @return array Query result
+	 * Supports selecting specific columns, applying where conditions, and returning either a single row or multiple rows. If branch filtering is enabled and the user is not a superadmin, results are limited to the current branch. Returns an empty structured array for single-row queries with no result.
+	 *
+	 * @param string $table The name of the database table.
+	 * @param array|null $where_array Optional associative array of where conditions.
+	 * @param bool $single If true, returns a single row as an associative array; otherwise, returns an array of rows.
+	 * @param bool $branch If true, applies branch-based filtering for multi-tenant support.
+	 * @param string $columns Columns to select, defaults to '*'.
+	 * @return array The query result as an associative array or array of rows. Returns an empty array or structured array if no result is found.
 	 */
 	public function get($table, $where_array = NULL, $single = false, $branch = false, $columns = '*') {
 		// Input validation
@@ -184,12 +192,14 @@ class MY_Model extends CI_Model {
 	}
 
 	/**
-	 * Modern and secure single record retrieval
+	 * Retrieves a single record by ID from the specified database table.
 	 *
-	 * @param string $table Table name
-	 * @param int|null $id Record ID
-	 * @param bool $single Return single object vs array
-	 * @return mixed Query result
+	 * Validates the table name and ID, then queries the table for the record with the given ID. Returns either a single object or an array of results based on the $single flag. Returns null or an empty array if inputs are invalid or on error.
+	 *
+	 * @param string $table The name of the database table.
+	 * @param int|null $id The ID of the record to retrieve.
+	 * @param bool $single If true, returns a single object; otherwise, returns an array.
+	 * @return mixed The query result as an object, array, null, or empty array depending on input and $single.
 	 */
 	public function getSingle($table, $id = NULL, $single = false) {
 		// Input validation
@@ -225,15 +235,17 @@ class MY_Model extends CI_Model {
 	}
 
 	/**
-	 * Modern and secure file upload with enhanced validation
+	 * Handles secure file uploads with validation and configurable options.
 	 *
-	 * @param string $media_name Form field name
-	 * @param string $upload_path Upload directory path
-	 * @param string $old_file Previous file to replace
-	 * @param bool $enc Encrypt filename
-	 * @param array $allowed_types Allowed file types
-	 * @param int $max_size Maximum file size in KB
-	 * @return string Uploaded filename or old filename
+	 * Validates input parameters, allowed file types, file size, and upload directory. Ensures the file is uploaded via HTTP POST, manages old file deletion, and returns the uploaded filename or the previous filename on failure.
+	 *
+	 * @param string $media_name The form field name containing the file.
+	 * @param string $upload_path The directory path where the file will be uploaded.
+	 * @param string $old_file The filename of the previous file to be replaced, if any.
+	 * @param bool $enc Whether to encrypt the uploaded filename.
+	 * @param array $allowed_types List of allowed file extensions. Defaults to common document and image types if not specified.
+	 * @param int $max_size Maximum allowed file size in kilobytes.
+	 * @return string The uploaded filename on success, or the old filename if upload fails.
 	 */
 	public function fileupload($media_name, $upload_path = "", $old_file = '', $enc = true, $allowed_types = [], $max_size = 2048) {
 		// Input validation

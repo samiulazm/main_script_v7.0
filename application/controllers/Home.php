@@ -404,6 +404,11 @@ class Home extends Frontend_Controller
         $this->load->view('home/layout/index', $this->data);
     }
 
+    /**
+     * Displays and processes the contact form for the website.
+     *
+     * Handles contact form display, input validation, optional captcha verification, and rate limiting of submissions. On successful validation, sends the contact message to the configured recipient and provides user feedback. Renders the contact page with appropriate CMS content and flash messages.
+     */
     public function contact()
     {
         $branchID = $this->home_model->getDefaultBranch();
@@ -544,6 +549,9 @@ class Home extends Frontend_Controller
         $this->load->view('home/layout/index', $this->data);
     }
 
+    /**
+     * Displays the admit card page with relevant CMS content for the default branch.
+     */
     public function admit_card()
     {
         $branchID = $this->home_model->getDefaultBranch();
@@ -554,7 +562,9 @@ class Home extends Frontend_Controller
     }
 
     /**
-     * Modern admit card print function with enhanced security
+     * Handles admit card printing requests with enhanced validation and security.
+     *
+     * Validates exam ID and register number from a POST request, securely cleans up old QR code files, verifies student enrollment for the current session, and ensures a valid template is selected. If validation passes, generates and returns the admit card HTML; otherwise, returns validation errors in JSON format.
      */
     public function admitCardprintFn()
     {
@@ -686,6 +696,9 @@ class Home extends Frontend_Controller
         }
     }
 
+    /**
+     * Displays the certificates page with relevant CMS content for the default branch.
+     */
     public function certificates()
     {
         $branchID = $this->home_model->getDefaultBranch();
@@ -696,7 +709,9 @@ class Home extends Frontend_Controller
     }
 
     /**
-     * Modern certificate print function with enhanced security
+     * Handles certificate printing requests with secure validation and QR code cleanup.
+     *
+     * Processes POST requests to generate and render a certificate for a student based on the provided template ID and register number. Validates input, securely cleans up old QR code files, verifies student existence, and returns a JSON response containing the rendered certificate HTML or validation errors.
      */
     public function certificatesPrintFn()
     {
@@ -863,7 +878,14 @@ class Home extends Frontend_Controller
         $this->load->view('home/layout/index', $this->data);
     }
 
-    // download online admission application form
+    /**
+     * Forces the download of the online admission application form for a given branch.
+     *
+     * Decodes the provided branch identifier, retrieves the corresponding application form file from the database,
+     * and initiates a file download if the form exists.
+     *
+     * @param string $value The encoded branch identifier.
+     */
     public function download_application_form($value='')
     {
         $this->load->helpers('download');
@@ -878,9 +900,11 @@ class Home extends Frontend_Controller
     }
 
     /**
-     * Secure QR code file cleanup helper method
+     * Deletes all image files from the QR code uploads directory with security checks.
      *
-     * @return bool Success status
+     * Only files with allowed image extensions (png, jpg, jpeg, gif) in the `uploads/qr_code/` directory are deleted. The method ensures the directory exists and is valid to prevent directory traversal attacks. Logs actions and errors during the cleanup process.
+     *
+     * @return bool True if cleanup completes without security violations or exceptions, false otherwise.
      */
     private function cleanupQRCodeFiles()
     {
