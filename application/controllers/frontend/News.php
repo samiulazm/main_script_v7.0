@@ -42,6 +42,11 @@ class News extends Admin_Controller
         }
     }
 
+    /**
+     * Handles listing and creation of frontend news items.
+     *
+     * On GET requests, displays the list of news items. On POST requests, validates and sanitizes input, checks permissions and CSRF token, and creates a new news item, returning a JSON response indicating success or validation errors.
+     */
     public function index()
     {
         // check access permission
@@ -140,7 +145,11 @@ class News extends Admin_Controller
         }
     }
 
-    // publish on show website
+    /**
+     * Updates the visibility status of a news item on the public website.
+     *
+     * Accepts POST data with the news item ID and desired visibility status, updates the corresponding record in the database, and returns a JSON response indicating success.
+     */
     public function show_website()
     {
         if ($_POST) {
@@ -162,10 +171,12 @@ class News extends Admin_Controller
     }
 
     /**
-     * Sanitize POST data for security
+     * Recursively sanitizes POST data to remove potentially unsafe content.
      *
-     * @param array $data POST data to sanitize
-     * @return array Sanitized data
+     * Applies specific sanitization for email, URL, and phone fields, and strips HTML tags from all other fields.
+     *
+     * @param array $data The POST data to sanitize.
+     * @return array The sanitized data array.
      */
     private function sanitizePostData($data)
     {
