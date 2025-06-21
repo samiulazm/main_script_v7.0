@@ -1,55 +1,138 @@
-window.theme = {};
+/**
+ * Modern Theme Object with ES6+ patterns
+ * Enhanced with better error handling and performance
+ */
+window.theme = window.theme || {};
 
-// Theme Common Functions
+// Theme Common Functions with modern JavaScript
 window.theme.fn = {
-	getOptions: function(opts) {
-		if (typeof(opts) == 'object') {
+	/**
+	 * Parse options with enhanced error handling
+	 * @param {*} opts - Options to parse
+	 * @returns {Object} Parsed options object
+	 */
+	getOptions(opts) {
+		// Use strict equality and modern type checking
+		if (typeof opts === 'object' && opts !== null) {
 			return opts;
-		} else if (typeof(opts) == 'string') {
+		}
+
+		if (typeof opts === 'string') {
 			try {
-				return JSON.parse(opts.replace(/'/g,'"').replace(';',''));
-			} catch(e) {
+				// More robust JSON parsing with better regex
+				const cleanedOpts = opts
+					.replace(/'/g, '"')
+					.replace(/;$/, '')
+					.trim();
+				return JSON.parse(cleanedOpts);
+			} catch (error) {
+				console.warn('Failed to parse options:', error.message);
 				return {};
 			}
-		} else {
-			return {};
 		}
+
+		return {};
+	},
+
+	/**
+	 * Debounce function for performance optimization
+	 * @param {Function} func - Function to debounce
+	 * @param {number} wait - Wait time in milliseconds
+	 * @param {boolean} immediate - Execute immediately
+	 * @returns {Function} Debounced function
+	 */
+	debounce(func, wait, immediate = false) {
+		let timeout;
+		return function executedFunction(...args) {
+			const later = () => {
+				timeout = null;
+				if (!immediate) func.apply(this, args);
+			};
+			const callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) func.apply(this, args);
+		};
+	},
+
+	/**
+	 * Throttle function for performance optimization
+	 * @param {Function} func - Function to throttle
+	 * @param {number} limit - Time limit in milliseconds
+	 * @returns {Function} Throttled function
+	 */
+	throttle(func, limit) {
+		let inThrottle;
+		return function(...args) {
+			if (!inThrottle) {
+				func.apply(this, args);
+				inThrottle = true;
+				setTimeout(() => inThrottle = false, limit);
+			}
+		};
 	}
 };
 
-// Navigation
+/**
+ * Modern Navigation Module with improved performance and accessibility
+ */
 (function($) {
-
 	'use strict';
 
-	var $items = $( '.nav-main li.nav-parent' );
+	// Cache DOM elements for better performance
+	const $items = $('.nav-main li.nav-parent');
+	const ANIMATION_SPEED = 300; // Configurable animation speed
 
-	function expand( $li ) {
-		$li.children( 'ul.nav-children' ).slideDown( 'fast', function() {
-			$li.addClass( 'nav-expanded' );
-			$(this).css( 'display', '' );
-			ensureVisible( $li );
+	/**
+	 * Expand navigation item with accessibility support
+	 * @param {jQuery} $li - Navigation item to expand
+	 */
+	function expand($li) {
+		const $children = $li.children('ul.nav-children');
+
+		// Add ARIA attributes for accessibility
+		$li.attr('aria-expanded', 'true');
+		$children.attr('aria-hidden', 'false');
+
+		$children.slideDown(ANIMATION_SPEED, function() {
+			$li.addClass('nav-expanded');
+			$(this).css('display', '');
+			ensureVisible($li);
 		});
 	}
 
-	function collapse( $li ) {
-		$li.children('ul.nav-children' ).slideUp( 'fast', function() {
-			$(this).css( 'display', '' );
-			$li.removeClass( 'nav-expanded' );
+	/**
+	 * Collapse navigation item with accessibility support
+	 * @param {jQuery} $li - Navigation item to collapse
+	 */
+	function collapse($li) {
+		const $children = $li.children('ul.nav-children');
+
+		// Update ARIA attributes
+		$li.attr('aria-expanded', 'false');
+		$children.attr('aria-hidden', 'true');
+
+		$children.slideUp(ANIMATION_SPEED, function() {
+			$(this).css('display', '');
+			$li.removeClass('nav-expanded');
 		});
 	}
 
-	function ensureVisible( $li ) {
-		var scroller = $li.offsetParent();
-		if ( !scroller.get(0) ) {
+	/**
+	 * Ensure navigation item is visible in viewport
+	 * @param {jQuery} $li - Navigation item to make visible
+	 */
+	function ensureVisible($li) {
+		const scroller = $li.offsetParent();
+		if (!scroller.length) {
 			return false;
 		}
 
-		var top = $li.position().top;
-		if ( top < 0 ) {
+		const top = $li.position().top;
+		if (top < 0) {
 			scroller.animate({
 				scrollTop: scroller.scrollTop() + top
-			}, 'fast');
+			}, ANIMATION_SPEED);
 		}
 	}
 
@@ -97,9 +180,9 @@ window.theme.fn = {
 		$window		= $( window ),
 		isAndroid	= navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
-	// mobile devices with fixed has a lot of issues when focus inputs and others...
-	if ( typeof $.browser !== 'undefined' && $.browser.mobile && $html.hasClass('fixed') ) {
-		$html.removeClass( 'fixed' ).addClass( 'scroll' );
+	// Modern mobile detection and handling
+	if (this.isMobileDevice() && $html.hasClass('fixed')) {
+		$html.removeClass('fixed').addClass('scroll');
 	}
 
 	var Skeleton = {
@@ -112,9 +195,22 @@ window.theme.fn = {
 			}
 		},
 
-		customScroll: ( !Modernizr.overflowscrolling && !isAndroid && $.fn.nanoScroller !== 'undefined'),
+		customScroll: (!Modernizr.overflowscrolling && !isAndroid && typeof $.fn.nanoScroller !== 'undefined'),
 
-		initialize: function() {
+		/**
+		 * Modern mobile device detection
+		 * @returns {boolean} True if mobile device
+		 */
+		isMobileDevice() {
+			return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+				   (window.innerWidth <= 768) ||
+				   ('ontouchstart' in window);
+		},
+
+		/**
+		 * Initialize the skeleton framework
+		 */
+		initialize() {
 			this
 				.setVars()
 				.build()
@@ -141,16 +237,19 @@ window.theme.fn = {
 			return this;
 		},
 
-		build: function() {
-
-			if ( typeof $.browser !== 'undefined' && $.browser.mobile ) {
-				$html.addClass( 'mobile-device' );
+		/**
+		 * Build the skeleton framework components
+		 */
+		build() {
+			// Modern mobile detection
+			if (this.isMobileDevice()) {
+				$html.addClass('mobile-device');
 			} else {
-				$html.addClass( 'no-mobile-device' );
+				$html.addClass('no-mobile-device');
 			}
 
-			$html.addClass( 'custom-scroll' );
-			if ( this.customScroll ) {
+			$html.addClass('custom-scroll');
+			if (this.customScroll) {
 				this.buildSidebarLeft();
 				this.buildContentMenu();
 			}

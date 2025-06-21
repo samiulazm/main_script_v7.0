@@ -16,21 +16,39 @@ class Faq extends Admin_Controller
         if (!get_permission('frontend_faq', 'is_view')) {
             access_denied();
         }
-        if ($_POST) {
+        // Modern POST handling with enhanced security
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
             if (!get_permission('frontend_faq', 'is_add')) {
                 access_denied();
             }
+
+            // CSRF protection
+            if (!$this->security->verify_csrf_token()) {
+                $array = ['status' => 'fail', 'error' => ['csrf' => 'Security token mismatch']];
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode($array));
+                exit();
+            }
+
             $this->services_validation();
             if ($this->form_validation->run() !== false) {
-                // save information in the database file
-                $this->frontend_model->save_faq($this->input->post());
+                // Secure input handling
+                $post_data = $this->input->post(NULL, TRUE); // XSS clean all POST data
+
+                // Save information in the database
+                $this->frontend_model->save_faq($post_data);
                 set_alert('success', translate('information_has_been_saved_successfully'));
-                $array = array('status' => 'success');
+                $array = ['status' => 'success'];
             } else {
                 $error = $this->form_validation->error_array();
-                $array = array('status' => 'fail', 'error' => $error);
+                $array = ['status' => 'fail', 'error' => $error];
             }
-            echo json_encode($array);
+
+            // Secure JSON response
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode($array));
             exit();
         }
         $this->data['headerelements'] = array(

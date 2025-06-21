@@ -25,24 +25,48 @@ class Authentication extends Authentication_Controller
             redirect(base_url('dashboard'));
         }
 
-        if ($_POST) {
-            $rules = array(
-                array(
+        // Modern POST data handling with proper validation
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
+            // Enhanced validation rules with modern syntax
+            $rules = [
+                [
                     'field' => 'email',
                     'label' => "Email",
-                    'rules' => 'trim|required',
-                ),
-                array(
+                    'rules' => 'trim|required|valid_email|max_length[255]',
+                    'errors' => [
+                        'required' => 'Email is required',
+                        'valid_email' => 'Please enter a valid email address',
+                        'max_length' => 'Email must not exceed 255 characters'
+                    ]
+                ],
+                [
                     'field' => 'password',
                     'label' => "Password",
-                    'rules' => 'trim|required',
-                ),
-            );
+                    'rules' => 'trim|required|min_length[6]|max_length[255]',
+                    'errors' => [
+                        'required' => 'Password is required',
+                        'min_length' => 'Password must be at least 6 characters',
+                        'max_length' => 'Password must not exceed 255 characters'
+                    ]
+                ],
+            ];
             $this->form_validation->set_rules($rules);
             if ($this->form_validation->run() !== false) {
-                $email = $this->input->post('email');
-                $password = $this->input->post('password');
-                // username is okey lets check the password now
+                // Secure input handling with XSS protection
+                $email = $this->input->post('email', TRUE); // XSS clean
+                $password = $this->input->post('password', FALSE); // Don't XSS clean passwords
+
+                // Load security helper for rate limiting
+                $this->load->helper('security');
+
+                // Rate limiting for login attempts
+                if (!rate_limit_check('login_attempt', 5, 900)) {
+                    $this->session->set_flashdata('error', 'Too many login attempts. Please try again later.');
+                    redirect(base_url('authentication'));
+                    return;
+                }
+
+                // Validate credentials
                 $login_credential = $this->authentication_model->login_credential($email, $password);
                 if ($login_credential) {
                     if ($login_credential->active) {
@@ -161,25 +185,43 @@ class Authentication extends Authentication_Controller
             redirect(base_url('dashboard'), 'refresh');
         }
 
-        if ($_POST) {
-            $config = array(
-                array(
+        // Modern POST handling for forgot password
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
+            // Enhanced validation with modern array syntax
+            $config = [
+                [
                     'field' => 'username',
                     'label' => 'Email',
-                    'rules' => 'trim|required',
-                ),
-            );
+                    'rules' => 'trim|required|valid_email|max_length[255]',
+                    'errors' => [
+                        'required' => 'Email is required',
+                        'valid_email' => 'Please enter a valid email address',
+                        'max_length' => 'Email must not exceed 255 characters'
+                    ]
+                ],
+            ];
             $this->form_validation->set_rules($config);
             if ($this->form_validation->run() !== false) {
-                $username = $this->input->post('username');
-                $res = $this->authentication_model->lose_password($username);
-                if ($res == true) {
-                    $this->session->set_flashdata('reset_res', 'true');
+                // Secure input handling
+                $username = $this->input->post('username', TRUE); // XSS clean
+
+                // Rate limiting for password reset attempts
+                if (!rate_limit_check('password_reset', 3, 3600)) {
+                    $this->session->set_flashdata('reset_res', 'rate_limited');
                     redirect(base_url('authentication/forgot'));
+                    return;
+                }
+
+                // Process password reset
+                $res = $this->authentication_model->lose_password($username);
+
+                if ($res === true) {
+                    $this->session->set_flashdata('reset_res', 'true');
                 } else {
                     $this->session->set_flashdata('reset_res', 'false');
-                    redirect(base_url('authentication/forgot'));
                 }
+
+                redirect(base_url('authentication/forgot'));
             }
         }
         $this->data['branch_id'] = $this->authentication_model->urlaliasToBranch($url_alias);

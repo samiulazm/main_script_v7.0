@@ -797,17 +797,133 @@ class Student extends Admin_Controller
         echo json_encode($result);
     }
 
-    // file downloader
+    /**
+     * Secure file downloader with enhanced validation
+     */
     public function documents_download()
     {
-        $encrypt_name = urldecode($this->input->get('file'));
-        if(preg_match('/^[^.][-a-z0-9_.]+[a-z]$/i', $encrypt_name)) {
-            $file_name = $this->db->select('file_name')->where('enc_name', $encrypt_name)->get('student_documents')->row()->file_name;
-            if (!empty($file_name)) {
-                $this->load->helper('download');
-                force_download($file_name, file_get_contents('./uploads/attachments/documents/' . $encrypt_name));
-            }
+        // Enhanced input validation and sanitization
+        $encrypt_name = $this->input->get('file', TRUE); // XSS clean
+
+        if (empty($encrypt_name)) {
+            show_404();
+            return;
         }
+
+        // URL decode and validate
+        $encrypt_name = urldecode($encrypt_name);
+
+        // Enhanced regex pattern for better security
+        if (!preg_match('/^[a-zA-Z0-9_-]+\.[a-zA-Z0-9]+$/', $encrypt_name)) {
+            log_message('error', 'Invalid file name pattern: ' . $encrypt_name);
+            show_404();
+            return;
+        }
+
+        // Prevent directory traversal
+        if (strpos($encrypt_name, '..') !== false || strpos($encrypt_name, '/') !== false || strpos($encrypt_name, '\\') !== false) {
+            log_message('error', 'Directory traversal attempt: ' . $encrypt_name);
+            show_404();
+            return;
+        }
+
+        try {
+            // Secure database query with proper error handling
+            $this->db->select('file_name, student_id');
+            $this->db->where('enc_name', $encrypt_name);
+            $query = $this->db->get('student_documents');
+
+            if ($query->num_rows() === 0) {
+                log_message('info', 'File not found in database: ' . $encrypt_name);
+                show_404();
+                return;
+            }
+
+            $file_data = $query->row();
+
+            // Additional permission check - ensure user can access this file
+            if (!$this->canAccessFile($file_data->student_id)) {
+                log_message('warning', 'Unauthorized file access attempt: ' . $encrypt_name);
+                show_error('Access denied', 403);
+                return;
+            }
+
+            // Construct secure file path
+            $file_path = './uploads/attachments/documents/' . $encrypt_name;
+
+            // Validate file exists and is within allowed directory
+            $real_path = realpath($file_path);
+            $allowed_path = realpath('./uploads/attachments/documents/');
+
+            if (!$real_path || strpos($real_path, $allowed_path) !== 0) {
+                log_message('error', 'File path validation failed: ' . $file_path);
+                show_404();
+                return;
+            }
+
+            if (!file_exists($real_path) || !is_file($real_path)) {
+                log_message('error', 'File not found on filesystem: ' . $real_path);
+                show_404();
+                return;
+            }
+
+            // Validate file size (prevent memory issues)
+            $file_size = filesize($real_path);
+            if ($file_size > 50 * 1024 * 1024) { // 50MB limit
+                log_message('error', 'File too large for download: ' . $real_path);
+                show_error('File too large', 413);
+                return;
+            }
+
+            // Secure file download
+            $this->load->helper('download');
+            $file_content = file_get_contents($real_path);
+
+            if ($file_content === false) {
+                log_message('error', 'Failed to read file: ' . $real_path);
+                show_error('File read error', 500);
+                return;
+            }
+
+            // Log successful download
+            log_message('info', 'File downloaded: ' . $encrypt_name . ' by user: ' . get_loggedin_user_id());
+
+            force_download($file_data->file_name, $file_content);
+
+        } catch (Exception $e) {
+            log_message('error', 'File download error: ' . $e->getMessage());
+            show_error('Download failed', 500);
+        }
+    }
+
+    /**
+     * Check if current user can access the specified file
+     *
+     * @param int $student_id Student ID from file record
+     * @return bool Access permission
+     */
+    private function canAccessFile($student_id)
+    {
+        // Admin and superadmin can access all files
+        if (is_admin_loggedin() || is_superadmin_loggedin()) {
+            return true;
+        }
+
+        // Students can only access their own files
+        if (is_student_loggedin()) {
+            return get_loggedin_user_id() == $student_id;
+        }
+
+        // Parents can access their children's files
+        if (is_parent_loggedin()) {
+            $parent_id = get_loggedin_user_id();
+            $this->db->where('parent_id', $parent_id);
+            $this->db->where('id', $student_id);
+            $query = $this->db->get('enroll');
+            return $query->num_rows() > 0;
+        }
+
+        return false;
     }
 
     /* sample csv downloader */

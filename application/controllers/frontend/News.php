@@ -48,21 +48,40 @@ class News extends Admin_Controller
         if (!get_permission('frontend_news', 'is_view')) {
             access_denied();
         }
-        if ($_POST) {
+        // Modern POST handling with enhanced security
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
             if (!get_permission('frontend_news', 'is_add')) {
                 access_denied();
             }
+
+            // CSRF protection
+            if (!$this->security->verify_csrf_token()) {
+                $array = ['status' => 'fail', 'error' => ['csrf' => 'Security token mismatch']];
+                echo json_encode($array);
+                exit();
+            }
+
             $this->news_validation();
             if ($this->form_validation->run() !== false) {
-                // save information in the database file
-                $this->news_model->save($this->input->post());
+                // Secure input handling
+                $post_data = $this->input->post(NULL, TRUE); // XSS clean all POST data
+
+                // Additional input sanitization
+                $post_data = $this->sanitizePostData($post_data);
+
+                // Save information in the database
+                $this->news_model->save($post_data);
                 set_alert('success', translate('information_has_been_saved_successfully'));
-                $array = array('status' => 'success');
+                $array = ['status' => 'success'];
             } else {
                 $error = $this->form_validation->error_array();
-                $array = array('status' => 'fail', 'error' => $error);
+                $array = ['status' => 'fail', 'error' => $error];
             }
-            echo json_encode($array);
+
+            // Secure JSON response
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode($array));
             exit();
         }
 
@@ -140,5 +159,46 @@ class News extends Admin_Controller
             $return = array('msg' => translate('information_has_been_updated_successfully'), 'status' => true);
             echo json_encode($return);
         }
+    }
+
+    /**
+     * Sanitize POST data for security
+     *
+     * @param array $data POST data to sanitize
+     * @return array Sanitized data
+     */
+    private function sanitizePostData($data)
+    {
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $sanitized = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $sanitized[$key] = $this->sanitizePostData($value);
+            } else {
+                // Additional sanitization based on field type
+                switch ($key) {
+                    case 'email':
+                        $sanitized[$key] = filter_var($value, FILTER_SANITIZE_EMAIL);
+                        break;
+                    case 'url':
+                    case 'website':
+                        $sanitized[$key] = filter_var($value, FILTER_SANITIZE_URL);
+                        break;
+                    case 'phone':
+                    case 'mobile':
+                        $sanitized[$key] = preg_replace('/[^0-9+\-\s()]/', '', $value);
+                        break;
+                    default:
+                        // General HTML and script tag removal
+                        $sanitized[$key] = strip_tags($value);
+                        break;
+                }
+            }
+        }
+
+        return $sanitized;
     }
 }
