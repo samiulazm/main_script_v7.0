@@ -131,7 +131,8 @@ class MY_Model extends CI_Model {
 			return $single ? [] : [];
 		}
 
-		// Sanitize table name to prevent SQL injection
+		// Store raw table name and sanitize table name to prevent SQL injection
+		$raw_table = $table;
 		$table = $this->db->escape_identifiers($table);
 
 		try {
