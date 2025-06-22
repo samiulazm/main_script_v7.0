@@ -19,6 +19,9 @@ class Security_monitor {
     protected $config;
     protected $log_table = 'security_events';
 
+    /**
+     * Initializes the Security_monitor library, loading configuration and helpers, and ensuring the security events table exists.
+     */
     public function __construct() {
         $this->CI =& get_instance();
         $this->CI->load->config('security_modern');
@@ -32,7 +35,15 @@ class Security_monitor {
     }
 
     /**
-     * Log security event
+     * Logs a security event to the database and application log.
+     *
+     * Records details such as event type, description, severity, user ID, IP address, user agent, URL, and additional context. Triggers alert checks based on configured thresholds.
+     *
+     * @param string $event_type The type of security event (e.g., 'failed_login', 'file_upload').
+     * @param string $description A description of the event.
+     * @param string $severity The severity level ('info', 'warning', 'critical'). Defaults to 'info'.
+     * @param array $context Optional additional context data to store with the event.
+     * @return bool True if the event was logged, false if logging is disabled.
      */
     public function logEvent($event_type, $description, $severity = 'info', $context = []) {
         if (!$this->config['enabled']) {
@@ -65,7 +76,12 @@ class Security_monitor {
     }
 
     /**
-     * Monitor failed login attempts
+     * Logs a failed login attempt and checks for brute force attack patterns.
+     *
+     * Records a warning event for a failed login with the provided email and IP address, then analyzes recent failed attempts to detect potential brute force or account attack activity.
+     *
+     * @param string $email The email address used in the failed login attempt.
+     * @param string $ip_address The IP address from which the failed login attempt originated.
      */
     public function monitorFailedLogin($email, $ip_address) {
         $this->logEvent(
@@ -80,7 +96,10 @@ class Security_monitor {
     }
 
     /**
-     * Monitor successful logins
+     * Logs a successful login event if configured to do so.
+     *
+     * @param int|string $user_id The ID of the user who logged in.
+     * @param string $email The email address of the user who logged in.
      */
     public function monitorSuccessfulLogin($user_id, $email) {
         if ($this->config['log_successful_logins']) {
@@ -94,7 +113,13 @@ class Security_monitor {
     }
 
     /**
-     * Monitor file upload attempts
+     * Logs a file upload event, recording whether the upload was successful or blocked.
+     *
+     * If file upload logging is enabled in the configuration, this method logs an event with details about the file and its type. The event type and severity reflect whether the upload succeeded or was blocked.
+     *
+     * @param string $filename The name of the file involved in the upload attempt.
+     * @param string $file_type The MIME type or file type of the uploaded file.
+     * @param bool $success Indicates if the upload was successful (true) or blocked (false).
      */
     public function monitorFileUpload($filename, $file_type, $success = true) {
         if ($this->config['log_file_uploads']) {
@@ -114,7 +139,11 @@ class Security_monitor {
     }
 
     /**
-     * Monitor suspicious activity
+     * Logs a suspicious activity event with warning severity if enabled in configuration.
+     *
+     * @param string $activity_type The type of suspicious activity detected.
+     * @param string $description A description of the suspicious activity.
+     * @param array $context Optional additional context for the event.
      */
     public function monitorSuspiciousActivity($activity_type, $description, $context = []) {
         if ($this->config['log_suspicious_activity']) {
@@ -128,7 +157,13 @@ class Security_monitor {
     }
 
     /**
-     * Monitor permission changes
+     * Logs a permission change event for a specified user.
+     *
+     * Records an informational security event when a permission is added, removed, or modified for a user, if permission change logging is enabled in the configuration.
+     *
+     * @param mixed $target_user The identifier of the user whose permission was changed.
+     * @param string $permission The name of the permission affected.
+     * @param string $action The action performed on the permission (e.g., 'granted', 'revoked').
      */
     public function monitorPermissionChange($target_user, $permission, $action) {
         if ($this->config['log_permission_changes']) {
@@ -146,7 +181,12 @@ class Security_monitor {
     }
 
     /**
-     * Get security events
+     * Retrieves security event records from the database with optional filtering and pagination.
+     *
+     * @param int $limit The maximum number of events to return.
+     * @param int $offset The number of events to skip before starting to collect the result set.
+     * @param array $filters Optional filters: 'event_type', 'severity', 'user_id', 'ip_address', 'date_from', 'date_to'.
+     * @return array An array of security event records matching the specified criteria.
      */
     public function getEvents($limit = 100, $offset = 0, $filters = []) {
         $this->CI->db->select('*');
@@ -179,7 +219,12 @@ class Security_monitor {
     }
 
     /**
-     * Get security statistics
+     * Retrieves aggregated security statistics for a specified time period.
+     *
+     * Computes totals and breakdowns of security events over the past given number of days, including total events, counts by event type and severity, top IP addresses, and failed login attempts.
+     *
+     * @param int $days Number of days in the past to include in the statistics (default is 30).
+     * @return array Associative array containing security statistics.
      */
     public function getSecurityStats($days = 30) {
         $date_from = date('Y-m-d H:i:s', strtotime("-{$days} days"));
@@ -219,7 +264,12 @@ class Security_monitor {
     }
 
     /**
-     * Check for brute force patterns
+     * Detects brute force attack patterns based on recent failed login attempts.
+     *
+     * Checks for multiple failed login attempts from the same IP address or targeting the same email within a 15-minute window. If the number of attempts meets or exceeds the threshold, logs a critical security event for brute force or account attack detection.
+     *
+     * @param string $email The email address associated with the failed login attempts.
+     * @param string $ip_address The IP address from which the failed login attempts originated.
      */
     private function checkBruteForcePattern($email, $ip_address) {
         $time_window = 900; // 15 minutes
@@ -259,7 +309,10 @@ class Security_monitor {
     }
 
     /**
-     * Check alert conditions
+     * Checks if the number of recent events of a given type meets or exceeds the configured alert threshold and triggers an alert if necessary.
+     *
+     * @param string $event_type The type of event to evaluate for alerting.
+     * @param string $severity The severity level of the event.
      */
     private function checkAlertConditions($event_type, $severity) {
         if (!isset($this->config['alert_threshold'])) {
@@ -281,7 +334,10 @@ class Security_monitor {
     }
 
     /**
-     * Send security alert
+     * Logs a critical security alert event when a threshold for a specific event type is exceeded.
+     *
+     * @param string $event_type The type of event triggering the alert.
+     * @param int $count The number of events detected within the alert window.
      */
     private function sendAlert($event_type, $count) {
         // Log the alert
@@ -298,7 +354,9 @@ class Security_monitor {
     }
 
     /**
-     * Clean old security events
+     * Deletes security events older than the configured retention period.
+     *
+     * If a retention period is set in the configuration, removes events from the security log table that are older than the specified number of days. Logs a maintenance event if any records are deleted.
      */
     public function cleanOldEvents() {
         if (!isset($this->config['retention_days'])) {
@@ -322,7 +380,9 @@ class Security_monitor {
     }
 
     /**
-     * Create security events table
+     * Ensures the security events database table exists, creating it with the required schema if absent.
+     *
+     * Defines fields for event metadata, including event type, description, severity, user ID, IP address, user agent, URL, context, and timestamp, along with appropriate indexes.
      */
     private function createSecurityTable() {
         if (!$this->CI->db->table_exists($this->log_table)) {
@@ -385,7 +445,9 @@ class Security_monitor {
     }
 
     /**
-     * Get current user ID
+     * Retrieves the current logged-in user ID if available.
+     *
+     * @return mixed The user ID of the currently logged-in user, or null if not available.
      */
     private function getCurrentUserId() {
         if (function_exists('get_loggedin_user_id')) {

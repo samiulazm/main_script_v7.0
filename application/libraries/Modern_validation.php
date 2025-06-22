@@ -19,6 +19,11 @@ class Modern_validation {
     protected $rules = [];
     protected $data = [];
 
+    /**
+     * Initializes the Modern_validation library and loads required helpers.
+     *
+     * Sets up the CodeIgniter instance and loads the security helper for use in validation routines.
+     */
     public function __construct() {
         $this->CI =& get_instance();
         $this->CI->load->helper('security');
@@ -26,10 +31,13 @@ class Modern_validation {
     }
 
     /**
-     * Set validation rules with modern syntax
-     * 
-     * @param array $rules Validation rules
-     * @return $this
+     * Sets the validation rules for the current validation session.
+     *
+     * Accepts an array of rules, where each rule defines the field, validation criteria, and optional label.
+     * Enables method chaining.
+     *
+     * @param array $rules Array of validation rules.
+     * @return self
      */
     public function setRules(array $rules) {
         $this->rules = $rules;
@@ -37,10 +45,10 @@ class Modern_validation {
     }
 
     /**
-     * Set data to validate
-     * 
-     * @param array $data Data to validate
-     * @return $this
+     * Assigns the data array to be validated.
+     *
+     * @param array $data The data to validate.
+     * @return $this The current instance for method chaining.
      */
     public function setData(array $data) {
         $this->data = $data;
@@ -48,9 +56,11 @@ class Modern_validation {
     }
 
     /**
-     * Run validation
-     * 
-     * @return bool True if validation passes
+     * Executes all defined validation rules against the provided data.
+     *
+     * Iterates through each field and its associated rules, applying validation and collecting errors. Returns true if all validations pass; otherwise, returns false.
+     *
+     * @return bool True if all validations succeed; false if any validation fails.
      */
     public function run() {
         $this->errors = [];
@@ -64,11 +74,11 @@ class Modern_validation {
     }
 
     /**
-     * Validate individual field
-     * 
-     * @param string $field Field name
-     * @param mixed $value Field value
-     * @param array $rule_set Rule configuration
+     * Applies all validation rules to a single field and records the first error encountered.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value of the field to validate.
+     * @param array $rule_set The set of validation rules and optional label for the field.
      */
     protected function validateField($field, $value, $rule_set) {
         $rules = explode('|', $rule_set['rules'] ?? '');
@@ -82,13 +92,15 @@ class Modern_validation {
     }
 
     /**
-     * Apply individual validation rule
-     * 
-     * @param string $field Field name
-     * @param mixed $value Field value
-     * @param string $rule Rule to apply
-     * @param string $label Field label
-     * @return bool True if rule passes
+     * Applies a single validation rule to a field value.
+     *
+     * Determines the rule type and invokes the corresponding validation method. Returns true if the value passes the rule, or false if it fails. Unknown rules are considered as passed.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $rule The validation rule to apply, possibly with parameters.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value passes the rule, false otherwise.
      */
     protected function applyRule($field, $value, $rule, $label) {
         // Parse rule and parameters
@@ -166,7 +178,14 @@ class Modern_validation {
     }
 
     /**
-     * Validation rule implementations
+     * Validates that a value is present and not empty, except for the string '0'.
+     *
+     * Sets an error message if the value is missing or empty.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is present; false otherwise.
      */
     protected function validateRequired($field, $value, $label) {
         if (empty($value) && $value !== '0') {
@@ -176,6 +195,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value's length is at least the specified minimum.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check.
+     * @param int|string $param The minimum required length.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value meets the minimum length, false otherwise.
+     */
     protected function validateMinLength($field, $value, $param, $label) {
         if (strlen($value) < (int)$param) {
             $this->errors[$field] = "{$label} must be at least {$param} characters";
@@ -184,6 +212,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value does not exceed the specified maximum length.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check.
+     * @param int|string $param The maximum allowed length.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value's length is less than or equal to the maximum, false otherwise.
+     */
     protected function validateMaxLength($field, $value, $param, $label) {
         if (strlen($value) > (int)$param) {
             $this->errors[$field] = "{$label} must not exceed {$param} characters";
@@ -192,6 +229,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value has exactly the specified number of characters.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check.
+     * @param int|string $param The required exact length.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value's length matches the specified length, false otherwise.
+     */
     protected function validateExactLength($field, $value, $param, $label) {
         if (strlen($value) !== (int)$param) {
             $this->errors[$field] = "{$label} must be exactly {$param} characters";
@@ -200,6 +246,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the given value is a properly formatted email address.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is a valid email address, false otherwise.
+     */
     protected function validateEmail($field, $value, $label) {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
             $this->errors[$field] = "{$label} must be a valid email address";
@@ -208,6 +262,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value is a properly formatted URL.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is a valid URL, false otherwise.
+     */
     protected function validateUrl($field, $value, $label) {
         if (!filter_var($value, FILTER_VALIDATE_URL)) {
             $this->errors[$field] = "{$label} must be a valid URL";
@@ -216,6 +278,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value is numeric.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is numeric, false otherwise.
+     */
     protected function validateNumeric($field, $value, $label) {
         if (!is_numeric($value)) {
             $this->errors[$field] = "{$label} must be numeric";
@@ -224,6 +294,16 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value is an integer.
+     *
+     * Sets an error message if the value is not a valid integer.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is an integer, false otherwise.
+     */
     protected function validateInteger($field, $value, $label) {
         if (!filter_var($value, FILTER_VALIDATE_INT)) {
             $this->errors[$field] = "{$label} must be an integer";
@@ -232,6 +312,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value contains only alphabetic characters.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is alphabetic, false otherwise.
+     */
     protected function validateAlpha($field, $value, $label) {
         if (!preg_match('/^[a-zA-Z]+$/', $value)) {
             $this->errors[$field] = "{$label} may only contain alphabetic characters";
@@ -240,6 +328,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value contains only alphanumeric characters.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is alphanumeric, false otherwise.
+     */
     protected function validateAlphaNumeric($field, $value, $label) {
         if (!preg_match('/^[a-zA-Z0-9]+$/', $value)) {
             $this->errors[$field] = "{$label} may only contain alphanumeric characters";
@@ -248,6 +344,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value contains only alphanumeric characters, dashes, or underscores.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is valid; false otherwise.
+     */
     protected function validateAlphaDash($field, $value, $label) {
         if (!preg_match('/^[a-zA-Z0-9_-]+$/', $value)) {
             $this->errors[$field] = "{$label} may only contain alphanumeric characters, dashes, and underscores";
@@ -256,6 +360,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value of a field matches the value of another specified field.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value of the field being validated.
+     * @param string $param The name of the field to match against.
+     * @param string $label The label of the field being validated.
+     * @return bool True if the values match, false otherwise.
+     */
     protected function validateMatches($field, $value, $param, $label) {
         $match_value = $this->data[$param] ?? null;
         if ($value !== $match_value) {
@@ -265,6 +378,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value of the given field is different from the value of another specified field.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value of the field being validated.
+     * @param string $param The name of the field to compare against.
+     * @param string $label The label of the field being validated.
+     * @return bool True if the values differ, false otherwise.
+     */
     protected function validateDiffers($field, $value, $param, $label) {
         $compare_value = $this->data[$param] ?? null;
         if ($value === $compare_value) {
@@ -274,6 +396,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Checks if a value is unique in a specified database table and column.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check for uniqueness.
+     * @param string $param The table and column in the format 'table.column'.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is unique, false if it already exists.
+     */
     protected function validateUnique($field, $value, $param, $label) {
         list($table, $column) = explode('.', $param);
         $query = $this->CI->db->get_where($table, [$column => $value]);
@@ -284,6 +415,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value is greater than the specified parameter.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check.
+     * @param mixed $param The value to compare against.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is greater than the parameter, false otherwise.
+     */
     protected function validateGreaterThan($field, $value, $param, $label) {
         if ((float)$value <= (float)$param) {
             $this->errors[$field] = "{$label} must be greater than {$param}";
@@ -292,6 +432,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value is numerically less than the specified parameter.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param mixed $param The value to compare against.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is less than the parameter, false otherwise.
+     */
     protected function validateLessThan($field, $value, $param, $label) {
         if ((float)$value >= (float)$param) {
             $this->errors[$field] = "{$label} must be less than {$param}";
@@ -300,6 +449,15 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that a value matches a specified regular expression pattern.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $param The regular expression pattern to match.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value matches the pattern, false otherwise.
+     */
     protected function validateRegex($field, $value, $param, $label) {
         if (!preg_match($param, $value)) {
             $this->errors[$field] = "{$label} format is invalid";
@@ -308,6 +466,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that a value is a valid date in 'YYYY-MM-DD' format.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the value is a valid date in the specified format, false otherwise.
+     */
     protected function validateDate($field, $value, $label) {
         $date = DateTime::createFromFormat('Y-m-d', $value);
         if (!$date || $date->format('Y-m-d') !== $value) {
@@ -317,6 +483,16 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that a value meets strong password requirements.
+     *
+     * The password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.
+     *
+     * @param string $field The name of the field being validated.
+     * @param string $value The password value to validate.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the password meets all strength requirements, false otherwise.
+     */
     protected function validateStrongPassword($field, $value, $label) {
         $errors = [];
         
@@ -343,6 +519,14 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that a filename contains only allowed characters (letters, numbers, dots, underscores, and dashes).
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to validate as a filename.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if the filename is safe, false otherwise.
+     */
     protected function validateSafeFilename($field, $value, $label) {
         if (!preg_match('/^[a-zA-Z0-9._-]+$/', $value)) {
             $this->errors[$field] = "{$label} contains invalid characters";
@@ -351,6 +535,16 @@ class Modern_validation {
         return true;
     }
 
+    /**
+     * Validates that the value does not contain any <script> tags.
+     *
+     * Returns false and sets an error if the value includes script tags, helping to prevent script injection.
+     *
+     * @param string $field The name of the field being validated.
+     * @param mixed $value The value to check for script tags.
+     * @param string $label The human-readable label for the field.
+     * @return bool True if no script tags are present, false otherwise.
+     */
     protected function validateNoScriptTags($field, $value, $label) {
         if (preg_match('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/mi', $value)) {
             $this->errors[$field] = "{$label} contains prohibited content";
@@ -360,28 +554,28 @@ class Modern_validation {
     }
 
     /**
-     * Get validation errors
-     * 
-     * @return array Validation errors
+     * Returns all validation error messages.
+     *
+     * @return array An associative array of field names to error messages.
      */
     public function getErrors() {
         return $this->errors;
     }
 
     /**
-     * Get error for specific field
-     * 
-     * @param string $field Field name
-     * @return string|null Error message
+     * Retrieves the validation error message for a specific field.
+     *
+     * @param string $field The name of the field.
+     * @return string|null The error message for the field, or null if no error exists.
      */
     public function getError($field) {
         return $this->errors[$field] ?? null;
     }
 
     /**
-     * Check if validation has errors
-     * 
-     * @return bool True if has errors
+     * Determines whether any validation errors exist.
+     *
+     * @return bool True if there are validation errors; otherwise, false.
      */
     public function hasErrors() {
         return !empty($this->errors);

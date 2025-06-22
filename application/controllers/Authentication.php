@@ -18,7 +18,13 @@ class Authentication extends Authentication_Controller
         parent::__construct();
     }
 
-    /* email is okey lets check the password now */
+    /**
+     * Handles user login, authentication, and session initialization.
+     *
+     * Validates login credentials, applies rate limiting to prevent brute-force attacks, and manages user sessions for different roles (staff, parent, student). Supports multi-branch (school) environments, disables login for inactive accounts or branches, and integrates optional two-factor authentication if enabled. Redirects authenticated users to the dashboard or a previously stored URL. Loads school details for display on the login page.
+     *
+     * @param string $url_alias Optional URL alias to identify the school branch for login context.
+     */
     public function index($url_alias = '')
     {
         if (is_loggedin()) {
@@ -178,7 +184,13 @@ class Authentication extends Authentication_Controller
         $this->load->view('authentication/login', $this->data);
     }
 
-    // forgot password
+    /**
+     * Handles the initiation of a password reset request for users who have forgotten their password.
+     *
+     * Validates the provided email address, applies rate limiting to prevent abuse, and triggers the password reset process if the email is valid. Displays appropriate feedback messages and loads the password reset request view.
+     *
+     * @param string $url_alias Optional URL alias used to load branch-specific school details.
+     */
     public function forgot($url_alias = '')
     {
         if (is_loggedin()) {
