@@ -416,20 +416,96 @@ class Home extends Frontend_Controller
             );
         }
 
-        if ($_POST) {
-            $this->form_validation->set_rules('name', 'Name', 'trim|required');
-            $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
-            $this->form_validation->set_rules('phoneno', 'Phone', 'trim|required');
-            $this->form_validation->set_rules('subject', 'Subject', 'trim|required');
-            $this->form_validation->set_rules('message', 'Message', 'trim|required');
-            if ($captcha == 'enable') {
-                $this->form_validation->set_rules('g-recaptcha-response', 'Captcha', 'trim|required');
+        // Modern POST handling with enhanced validation
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
+            // Enhanced validation rules with modern array syntax
+            $validation_rules = [
+                [
+                    'field' => 'name',
+                    'label' => 'Name',
+                    'rules' => 'trim|required|min_length[2]|max_length[100]|regex_match[/^[a-zA-Z\s]+$/]',
+                    'errors' => [
+                        'required' => 'Name is required',
+                        'min_length' => 'Name must be at least 2 characters',
+                        'max_length' => 'Name must not exceed 100 characters',
+                        'regex_match' => 'Name can only contain letters and spaces'
+                    ]
+                ],
+                [
+                    'field' => 'email',
+                    'label' => 'Email',
+                    'rules' => 'trim|required|valid_email|max_length[255]',
+                    'errors' => [
+                        'required' => 'Email is required',
+                        'valid_email' => 'Please enter a valid email address',
+                        'max_length' => 'Email must not exceed 255 characters'
+                    ]
+                ],
+                [
+                    'field' => 'phoneno',
+                    'label' => 'Phone',
+                    'rules' => 'trim|required|min_length[10]|max_length[20]|regex_match[/^[0-9+\-\s()]+$/]',
+                    'errors' => [
+                        'required' => 'Phone number is required',
+                        'min_length' => 'Phone number must be at least 10 digits',
+                        'max_length' => 'Phone number must not exceed 20 characters',
+                        'regex_match' => 'Please enter a valid phone number'
+                    ]
+                ],
+                [
+                    'field' => 'subject',
+                    'label' => 'Subject',
+                    'rules' => 'trim|required|min_length[5]|max_length[200]',
+                    'errors' => [
+                        'required' => 'Subject is required',
+                        'min_length' => 'Subject must be at least 5 characters',
+                        'max_length' => 'Subject must not exceed 200 characters'
+                    ]
+                ],
+                [
+                    'field' => 'message',
+                    'label' => 'Message',
+                    'rules' => 'trim|required|min_length[10]|max_length[1000]',
+                    'errors' => [
+                        'required' => 'Message is required',
+                        'min_length' => 'Message must be at least 10 characters',
+                        'max_length' => 'Message must not exceed 1000 characters'
+                    ]
+                ]
+            ];
+
+            // Add captcha validation if enabled
+            if ($captcha === 'enable') {
+                $validation_rules[] = [
+                    'field' => 'g-recaptcha-response',
+                    'label' => 'Captcha',
+                    'rules' => 'trim|required',
+                    'errors' => [
+                        'required' => 'Please complete the captcha verification'
+                    ]
+                ];
             }
+
+            $this->form_validation->set_rules($validation_rules);
             if ($this->form_validation->run() !== false) {
-                if ($captcha == 'enable') {
-                    $captchaResponse = $this->recaptcha->verifyResponse($this->input->post('g-recaptcha-response'));
+                // Rate limiting for contact form submissions
+                $this->load->library('session');
+                $contact_attempts = $this->session->userdata('contact_attempts') ?: 0;
+                $last_contact_attempt = $this->session->userdata('last_contact_attempt') ?: 0;
+
+                // Max 3 submissions per hour per session
+                if ($contact_attempts >= 3 && (time() - $last_contact_attempt) < 3600) {
+                    $this->session->set_flashdata('error', 'Too many contact form submissions. Please try again later.');
+                    redirect(current_url());
+                    return;
+                }
+
+                // Verify captcha if enabled
+                if ($captcha === 'enable') {
+                    $captcha_response = $this->input->post('g-recaptcha-response', TRUE);
+                    $captchaResponse = $this->recaptcha->verifyResponse($captcha_response);
                 } else {
-                    $captchaResponse = array('success' => true);
+                    $captchaResponse = ['success' => true];
                 }
                 if ($captchaResponse['success'] == true) {
                     $name = $this->input->post('name');
@@ -477,22 +553,47 @@ class Home extends Frontend_Controller
         $this->load->view('home/layout/index', $this->data);
     }
 
+    /**
+     * Modern admit card print function with enhanced security
+     */
     public function admitCardprintFn()
     {
-        if ($_POST) {
+        // Modern POST handling
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
             $this->load->model('card_manage_model');
             $this->load->model('timetable_model');
-            $this->load->library('ciqrcode', array('cacheable' => false));
-            $this->form_validation->set_rules('exam_id', translate('exam'), 'trim|required');
-            $this->form_validation->set_rules('register_no', translate('register_no'), 'trim|required');
-            if ($this->form_validation->run() == true) {
-                //get all QR Code file
-                $files = glob('uploads/qr_code/*');
-                foreach ($files as $file) {
-                    if (is_file($file)) {
-                        unlink($file); //delete file
-                    }
-                }
+            $this->load->library('ciqrcode', ['cacheable' => false]);
+
+            // Enhanced validation rules
+            $validation_rules = [
+                [
+                    'field' => 'exam_id',
+                    'label' => translate('exam'),
+                    'rules' => 'trim|required|numeric|greater_than[0]',
+                    'errors' => [
+                        'required' => 'Exam selection is required',
+                        'numeric' => 'Invalid exam selection',
+                        'greater_than' => 'Please select a valid exam'
+                    ]
+                ],
+                [
+                    'field' => 'register_no',
+                    'label' => translate('register_no'),
+                    'rules' => 'trim|required|min_length[3]|max_length[50]|alpha_numeric',
+                    'errors' => [
+                        'required' => 'Register number is required',
+                        'min_length' => 'Register number must be at least 3 characters',
+                        'max_length' => 'Register number must not exceed 50 characters',
+                        'alpha_numeric' => 'Register number can only contain letters and numbers'
+                    ]
+                ]
+            ];
+
+            $this->form_validation->set_rules($validation_rules);
+
+            if ($this->form_validation->run() === true) {
+                // Secure QR code file cleanup
+                $this->cleanupQRCodeFiles();
                 $registerNo = $this->input->post('register_no');
 
                 $sessionID = get_session_id();        
@@ -594,18 +695,18 @@ class Home extends Frontend_Controller
         $this->load->view('home/layout/index', $this->data);
     }
 
+    /**
+     * Modern certificate print function with enhanced security
+     */
     public function certificatesPrintFn()
     {
-        if ($_POST) {
+        // Modern POST handling
+        if ($this->input->server('REQUEST_METHOD') === 'POST') {
             $this->load->model('certificate_model');
-            $this->load->library('ciqrcode', array('cacheable' => false));
-            //get all QR Code file
-            $files = glob('uploads/qr_code/*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    unlink($file); //delete file
-                }
-            }
+            $this->load->library('ciqrcode', ['cacheable' => false]);
+
+            // Secure QR code file cleanup
+            $this->cleanupQRCodeFiles();
 
             $this->form_validation->set_rules('templete_id', translate('certificate'), 'trim|required');
             $this->form_validation->set_rules('register_no', translate('register_no'), 'trim|required');
@@ -774,5 +875,61 @@ class Home extends Frontend_Controller
                 force_download($row->application_form_name, file_get_contents('uploads/admission_form/' . $row->application_form_file));
             }
         }  
+    }
+
+    /**
+     * Secure QR code file cleanup helper method
+     *
+     * @return bool Success status
+     */
+    private function cleanupQRCodeFiles()
+    {
+        try {
+            $qr_directory = 'uploads/qr_code/';
+
+            // Validate directory exists and is within allowed path
+            if (!is_dir($qr_directory)) {
+                log_message('info', 'QR code directory does not exist: ' . $qr_directory);
+                return true; // Not an error if directory doesn't exist
+            }
+
+            // Get real path to prevent directory traversal
+            $real_path = realpath($qr_directory);
+            $allowed_path = realpath('uploads/qr_code');
+
+            if ($real_path !== $allowed_path) {
+                log_message('error', 'Security violation: Invalid QR code directory path');
+                return false;
+            }
+
+            // Use DirectoryIterator for safer file iteration
+            $iterator = new DirectoryIterator($qr_directory);
+            $deleted_count = 0;
+
+            foreach ($iterator as $file) {
+                if ($file->isFile() && !$file->isDot()) {
+                    $file_path = $file->getPathname();
+
+                    // Additional security: only delete image files
+                    $allowed_extensions = ['png', 'jpg', 'jpeg', 'gif'];
+                    $file_extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+
+                    if (in_array($file_extension, $allowed_extensions, true)) {
+                        if (unlink($file_path)) {
+                            $deleted_count++;
+                        } else {
+                            log_message('warning', 'Failed to delete QR code file: ' . $file_path);
+                        }
+                    }
+                }
+            }
+
+            log_message('info', "QR code cleanup completed. Deleted {$deleted_count} files.");
+            return true;
+
+        } catch (Exception $e) {
+            log_message('error', 'QR code cleanup failed: ' . $e->getMessage());
+            return false;
+        }
     }
 }
