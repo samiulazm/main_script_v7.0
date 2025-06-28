@@ -4804,6 +4804,27 @@ ul#doctors-grid.grid > li > .bio-box {
     border-bottom-right-radius: 0 !important;
 }
 
+.admission-status-frm {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+}
+
+.admission-status-frm .admission-status-btn {
+    position: relative;
+}
+
+.admission-status-frm > .admission-status-btn + .admission-status-btn {
+    border-bottom-left-radius: 0;
+}
+
+.admission-status-btn:not(:last-child){
+    border-top-right-radius: 0;
+    margin-right: 1px;
+}
+
+
 /* latest news */
 .latest-title,
 .current-date {

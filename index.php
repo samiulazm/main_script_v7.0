@@ -69,11 +69,6 @@
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
-// Disable all error reporting in production
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-error_reporting(0);
-
 switch (ENVIRONMENT)
 {
 	case 'development':

@@ -506,6 +506,11 @@
                 </div>
             </div>
             <div class="row">
+                <?php
+                $delaycount = .2;
+                $count = 0;
+                foreach ($featureslist as $key => $feature) {
+                    ?>
                 <div class="col-lg-4 col-md-6 col-12">
                     <!-- Start Single Feature -->
                     <div class="single-feature wow fadeInUp" data-wow-delay="0.2s">

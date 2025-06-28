@@ -235,8 +235,14 @@
 	var statusScanning = "<?php echo translate('scanning')?>";
 
 	$(document).ready(function () {
+		console.log('Initializing DataTables...');
+		console.log('Staff table element:', $('.table-staff').length);
+		console.log('Student table element:', $('.table-stu').length);
+
 		initDatatable('.table-staff', 'qrcode_attendance/getStaffListDT');
-		initDatatable('.table-student', 'qrcode_attendance/getStuListDT');
+		initDatatable('.table-stu', 'qrcode_attendance/getStuListDT');
+
+		console.log('DataTables initialized');
 	});
 
 	var x = document.getElementById("successAudio");

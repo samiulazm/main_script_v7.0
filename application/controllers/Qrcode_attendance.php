@@ -58,29 +58,6 @@ class Qrcode_attendance extends Admin_Controller
         $this->load->view('layout/index', $this->data);
     }
 
-    public function student_entry()
-    {
-        if (!get_permission('qr_code_student_attendance', 'is_add')) {
-            access_denied();
-        }
-
-        $branchID = $this->application_model->get_branch_id();
-        $this->data['headerelements'] = array(
-            'css' => array(
-                'css/qr-code.css',
-            ),
-            'js' => array(
-                'vendor/qrcode/qrcode.min.js',
-                'js/qrcode_attendance.js',
-            ),
-        );
-        $this->data['branch_id'] = $branchID;
-        $this->data['getSettings'] = $this->qrcode_attendance_model->getSettings($branchID);
-        $this->data['title'] = translate('student_qr_attendance');
-        $this->data['sub_page'] = 'qrcode_attendance/student_entries';
-        $this->data['main_menu'] = 'qr_attendance';
-        $this->load->view('layout/index', $this->data);
-    }
 
     public function staff_entry()
     {
